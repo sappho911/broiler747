@@ -1,0 +1,1 @@
+folder for the images , pics etc.
