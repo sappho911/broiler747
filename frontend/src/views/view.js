@@ -1,1 +1,0 @@
-  // This is for view but views as exemple newGame.js etc should be separated .
