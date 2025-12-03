@@ -1,9 +1,10 @@
-import { return_main_menu } from "../controllers/choose_player.js";
-
-async function check_player_selection(){
-    const playerChosen = return_main_menu();
-    return playerChosen;
-}
 document.addEventListener("DOMContentLoaded", () => {
-    check_player_selection();
+    const playerName = localStorage.getItem("selectedPlayer");
+    const playerSlot = document.getElementById("player_name");
+
+    if (playerName) {
+        playerSlot.textContent = `Player: ${playerName}`;
+    } else {
+        playerSlot.textContent = "No player selected";
+    }
 });
