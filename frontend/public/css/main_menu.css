@@ -1,0 +1,123 @@
+/* Import pixel font */
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+/* Reset & base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #000; /* fallback */
+  background-image: url('../img/sky-loop.gif');
+  font-family: 'VT323', monospace;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  color: #ffffff;
+  overflow: hidden;
+  image-rendering: -webkit-optimize-contrast;
+  -ms-interpolation-mode: nearest-neighbor;
+}
+
+
+/* Pixel-style container box */
+.pixel-frame {
+  background-color: #111;          /* Dark inner panel */
+  border: 6px solid #ffcc00;       /* Bright yellow/gold border — classic! */
+  border-radius: 0;                /* Keep it sharp */
+  padding: 24px 16px;
+  display: inline-block;           /* Shrink to content width */
+  box-shadow: 0 0 0 2px #000;      /* Optional: outer dark outline for contrast */
+  
+  /* Ensure crisp rendering */
+  image-rendering: pixelated;
+}
+
+/* Optional: Add subtle inner glow or double-border effect */
+.pixel-frame::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border: 2px solid #ff6600;
+  pointer-events: none;
+  /* Only use if you want extra retro layering */
+}
+
+
+main {
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Player name header */
+#player_name {
+  font-size: 32px;
+  margin-bottom: 30px;
+  color: #ffcc00; /* Bright retro yellow */
+  text-shadow: 2px 2px 0 #cc6600; /* Optional: add depth */
+  letter-spacing: 2px;
+}
+
+/* Main menu container */
+.main-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Pixel-style buttons */
+.main-menu button {
+  /* Font & text */
+  font-family: 'VT323', monospace;
+  font-size: 24px;
+  color: #000;
+  text-align: center;
+  letter-spacing: 1px;
+
+  /* Button appearance */
+  background-color: #44cc66; /* Retro green */
+  border: 4px solid #228833;
+  border-radius: 0; /* Keep it sharp! */
+  padding: 14px 0;
+
+  /* Disable anti-aliasing */
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  image-rendering: pixelated;
+
+  /* Interaction */
+  cursor: pointer;
+  outline: none;
+  transition: none; /* Avoid smooth transitions — keep it snappy! */
+}
+
+/* Hover effect */
+.main-menu button:hover {
+  background-color: #66ff88;
+}
+
+/* Press-down effect (like old game buttons) */
+.main-menu button:active {
+  transform: translate(2px, 2px);
+  border-color: #005522;
+  background-color: #33aa55;
+}
+
+/* Optional: focus outline for accessibility (but pixel-friendly) */
+.main-menu button:focus {
+  outline: 2px solid #ffdd00;
+  outline-offset: 2px;
+}

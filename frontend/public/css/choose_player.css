@@ -1,0 +1,132 @@
+/* Import pixel font */
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+/* Global reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Animated background (reuse your GIF) */
+body {
+  background-image: url('../img/sky-loop.gif');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-attachment: fixed;
+  background-color: #000; /* fallback */
+
+  /* Pixel-perfect rendering */
+  image-rendering: pixelated;
+  image-rendering: -webkit-optimize-contrast;
+  -ms-interpolation-mode: nearest-neighbor;
+
+  font-family: 'VT323', monospace;
+  color: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Centered content */
+main {
+  width: 100%;
+  max-width: 420px;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Pixel UI frame */
+.pixel-frame {
+  background-color: #111;
+  border: 6px solid #55aaff; /* bright retro blue — change if you prefer! */
+  border-radius: 0;
+  padding: 20px 16px;
+  width: 100%;
+  text-align: center;
+}
+
+/* Title */
+.pixel-frame h1 {
+  font-size: 28px;
+  color: #ffcc00;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 0 #cc6600;
+  letter-spacing: 1px;
+}
+
+/* Player list */
+#player_list {
+  list-style: none;
+  margin-bottom: 24px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 8px;
+  border: 2px solid #336699;
+  background: #0a0a1a;
+}
+
+#player_list li {
+  padding: 8px 0;
+  font-size: 20px;
+  color: #aaffff;
+  cursor: pointer;
+  border-bottom: 1px dashed #335577;
+}
+
+#player_list li:last-child {
+  border-bottom: none;
+}
+
+#player_list li:hover {
+  color: #ffffff;
+  background: rgba(85, 170, 255, 0.2);
+}
+
+/* Buttons */
+.choose-player-menu button {
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  color: #000;
+  background: #ff66aa; /* retro pink/purple */
+  border: 4px solid #cc3388;
+  border-radius: 0;
+  padding: 12px 0;
+  width: 100%;
+  margin-top: 8px;
+  cursor: pointer;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  outline: none;
+}
+
+.choose-player-menu button:hover:not(:disabled) {
+  background: #ff99cc;
+}
+
+.choose-player-menu button:disabled {
+  background: #444;
+  border-color: #222;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.choose-player-menu button:active {
+  transform: translate(2px, 2px);
+  border-color: #990055;
+}
+
+/* Scrollbar (optional: make it pixel-like) */
+#player_list::-webkit-scrollbar {
+  width: 8px;
+}
+#player_list::-webkit-scrollbar-track {
+  background: #000;
+}
+#player_list::-webkit-scrollbar-thumb {
+  background: #55aaff;
+  border: 1px solid #000;
+}
