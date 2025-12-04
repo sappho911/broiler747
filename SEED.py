@@ -53,13 +53,13 @@ questions = [  # (question, choice_a, choice_b, choice_c, choice_d, correct_choi
 
 def get_connection():
     return mysql.connector.connect(
-        host= "127.0.0.1",
+    host= "127.0.0.1",
     port= 3306,
     database= "flight_game",
     user= "root",
     password= "2004",
     autocommit = True
-    )
+)
 
 
 def quiz_questions(limit = 5):
@@ -138,62 +138,6 @@ def initialize_player_table():
         except Exception:
             pass
 
-
-def generate_random_weather(delay):
-    sql = "SELECT name FROM goal"
-    connection = get_connection()
-    cursor = connection.cursor()
-    cursor.execute(sql)
-    result = cursor.fetchall()
-    cursor.close()
-    connection.close()
-    weathers = [row[0] for row in result]
-    needed_weathers = {'CLEAR', 'CLOUDS', 'WINDY'}
-    filtered_weathers = [w for w in weathers if w.upper() in needed_weathers]
-    if filtered_weathers:
-        random_weather = random.choice(filtered_weathers).lower().capitalize()
-    else:
-        random_weather = random.choice(['Clear', 'Clouds', 'Windy'])
-    time.sleep(delay)
-    return random_weather
-
-def get_random_airports_from_finland(limits=3):
-    sql = f" SELECT airport.name , airport.iata_code FROM airport INNER JOIN country ON airport.iso_country = country.iso_country WHERE country.name = 'Finland' AND airport.iata_code != '' AND airport.iata_code != 'HEL' ORDER BY RAND() LIMIT {limits}"
-    connection = get_connection()
-    cursor = connection.cursor()
-    cursor.execute(sql)
-    result = cursor.fetchall()
-    cursor.close()
-    connection.close()
-    for name, iata in result:
-        print(f"🛫 {iata} - {name}")
-    return ''
-
-
-def get_start_airport():
-    sql = "SELECT name FROM airport WHERE latitude_deg = 60.3172 AND longitude_deg = 24.963301"
-    connection = get_connection()
-    cursor = connection.cursor()
-    cursor.execute(sql)
-    result = cursor.fetchone()
-    cursor.close()
-    connection.close()
-    if result:
-        return result[0]
-    return "Helsinki Vantaa Airport"
-
-
-def get_helsinki_vantaa_coords():
-    sql = "SELECT latitude_deg, longitude_deg , name FROM airport WHERE name = 'Helsinki Vantaa Airport'"
-    connection = get_connection()
-    cursor = connection.cursor()
-    cursor.execute(sql)
-    result = cursor.fetchone()
-    cursor.close()
-    connection.close()
-    if result:
-        return result
-    return (60.3172, 24.963301, "Helsinki Vantaa Airport")
 
 def get_selected_airport(destination):
     sql = f"SELECT airport.name, airport.latitude_deg, airport.longitude_deg FROM airport WHERE iata_code ='{destination}'"
