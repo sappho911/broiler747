@@ -10,7 +10,7 @@ from SEED import (
     get_selected_airport,
     initialize_quiz_table
 )
-
+from flask_cors import CORS
 ## fix the def get_connection since its not fully working 
 def get_connection():
     return mysql.connector.connect(
@@ -23,6 +23,7 @@ def get_connection():
     )
 
 app = Flask(__name__)
+CORS(app)
 @app.route("/api/<name>", methods=["GET"]) 
 def namefetcher(name): ## Fetch data from the database depending the name given in the URL parameter.
     
