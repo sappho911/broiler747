@@ -70,4 +70,4 @@ def register_routes(app):
             return {"error": str(e)}, 500
     
     return app
-    
+@app.route('/ending_airport', methods= ["POST")

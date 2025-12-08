@@ -88,9 +88,11 @@ def initialize_player_table():
     try:
         cur.execute("""
             CREATE TABLE IF NOT EXISTS player (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                name VARCHAR(255) NOT NULL UNIQUE,
-                score INT DEFAULT 0,
+                Name VARCHAR(255) PRIMARY KEY,
+                weather VARCHAR(50),
+                Easy_Score INT(11) NULL DEFAULT NULL,
+	            Medium_Score INT(11) NULL DEFAULT NULL,
+	            Hard_Score INT(11) NULL DEFAULT NULL
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
