@@ -5,8 +5,7 @@ import random
 from flask import request
 from SEED import (
     quiz_questions, 
-    check_answer, 
-    get_start_airport, 
+    check_answer,  
     get_selected_airport,
     initialize_quiz_table
 )
@@ -15,27 +14,37 @@ from flask_cors import CORS
 def get_connection():
     return mysql.connector.connect(
     host= "127.0.0.1",
-    port= 3306,
+    port= 3305,
     database= "flight_game",
     user= "root",
-    password= "2004",
+    password= "tishchuk6370",
     autocommit = True
     )
-
 app = Flask(__name__)
 CORS(app)
-@app.route("/api/<name>", methods=["GET"]) 
-def namefetcher(name): ## Fetch data from the database depending the name given in the URL parameter.
-    
+
+@app.route("/api/players", methods=["GET"])
+def playersfetcher():
     conn = get_connection()
     cursor = conn.cursor()
-    query = "SELECT * FROM goal WHERE name = %s"
+    query = "SELECT screen_name FROM game"
+    cursor.execute(query)
+    results = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    # Convert list of tuples into JSON objects
+    players = [{"name": row[0]} for row in results]
+    return jsonify(players)
+
+@app.route("/api/<name>", methods=["GET"]) 
+def namefetcher(name): ## Fetch data from the database depending the name given in the URL parameter.
+    conn = get_connection()
+    cursor = conn.cursor()
+    query = "SELECT name FROM goal WHERE name = %s"
     cursor.execute(query, (name,))
     results = cursor.fetchall()
     cursor.close()
     conn.close()
-    
-
     return {"goals": results}
 
 @app.route("/start", methods=["POST"])
@@ -48,15 +57,11 @@ def start():
     
     try:
         initialize_quiz_table()
-        
         start_airport = get_start_airport()
         helsinki_coords = get_helsinki_vantaa_coords()
-        
         weather = generate_random_weather(0)
-        
         conn = get_connection()
         cursor = conn.cursor()
-        
         cursor.execute("SELECT id, name FROM goal WHERE name = %s", (player_name,))
         existing_goal = cursor.fetchone()
         
@@ -96,13 +101,12 @@ def refuel():
 @app.route("/seed_quiz", methods=["GET"])
 def seed_quiz(): 
     return {"questions": quiz_questions(5)}
+
 @app.route("/anwers", methods=["POST"])
 def Asnwers():
     data = request.json
-    
     correct_choice = data.get("correct_choice")
     user_choice = data.get("user_choice")
-    
     if not correct_choice or not user_choice:
         return {"error": "Missing correct_choice or user_choice"}
   
@@ -141,6 +145,8 @@ def save_result():
     except Exception as e:
         return {"error": str(e)}, 500"""
    return {"message": "Functionality not implemented yet and i need someone to ask about it"} 
+
+
 @app.route("/airports", methods=["get"])
 def get_airports():
     try:
@@ -179,10 +185,8 @@ def get_airports():
 def get_destination():
     data = request.json
     iata_code = data.get("iata_code")
-    
     if not iata_code:
         return {"error": "IATA code is required"}, 400
-    
     try:
         airport_info = get_selected_airport(iata_code)
         
@@ -206,5 +210,6 @@ def get_weather():
         return {"weather": weather}
     except Exception as e:
         return {"error": str(e)}, 500
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5000, host="0.0.0.0")

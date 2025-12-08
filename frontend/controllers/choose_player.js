@@ -1,38 +1,48 @@
 import { getPlayers } from "../model/players.js";
-// Initialize the player list on page load:
+
+// Runs when the page is fully loaded
 document.addEventListener("DOMContentLoaded", async () => {
-    const players = await getPlayers();
-    makePlayerList(players);
+    try {
+        const players = await getPlayers();
+        makePlayerList(players);
+        const chooseBtn = document.getElementById("choose_player_but");
+        const newPlayerBtn = document.getElementById("new_player_but");
+        chooseBtn.addEventListener("click", () => {
+            const selectedPlayer = localStorage.getItem("selectedPlayer");
+            if (selectedPlayer) {
+                window.location.href = "../views/main_menu.html";
+            } else {
+                alert("Please select a player first!");
+            }
+        });
+        // "CREATE NEW PLAYER" button
+        newPlayerBtn.addEventListener("click", () => {
+            window.location.href = "../views/new_player.html";
+        });
+
+    } catch (error) {
+        console.error("Failed to load players:", error);
+        const playerList = document.getElementById("player_list");
+        playerList.innerHTML = "<li>Failed to load players. Check console.</li>";
+    }
 });
-// Create the player list in the DOM and add selected one to LocalStorage to :
-function makePlayerList(players){
+
+// Creates and attaches the player list to the DOM
+function makePlayerList(players) {
     const playerList = document.getElementById("player_list");
-    //some player_name is selected for default, user then chooses a player name and buttons is enabled
+    playerList.innerHTML = "";
     players.forEach(player => {
         const li = document.createElement("li");
         li.textContent = player.name;
         li.addEventListener("click", () => {
-            // remove previous selection
-            document.querySelectorAll("#player_list li").forEach(item =>
-                item.classList.remove("selected")
-            );
-            // add selection to clicked one
+            // Deselect all
+            document.querySelectorAll("#player_list li").forEach(item => {
+                item.classList.remove("selected");
+            });
             li.classList.add("selected");
-            document.getElementById("choose_player_but").disabled = false;
-            // store selected player globally
             localStorage.setItem("selectedPlayer", player.name);
+            document.getElementById("choose_player_but").disabled = false;
         });
         playerList.appendChild(li);
     });
-}
-
-export function return_main_menu(){
-    if (playerChosen()){
-         let chooseButton = document.getElementById("choose_player_but");
-         chooseButton.disabled = false;
-    }
-    else{
-        let chooseButton = document.getElementById("choose_player_but");
-        chooseButton.disabled = true;
-    }
 }
