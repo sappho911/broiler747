@@ -70,4 +70,13 @@ def register_routes(app):
             return {"error": str(e)}, 500
     
     return app
-@app.route('/ending_airport', methods= ["POST")
+    @app.route('/ending_airport', methods= ["POST"])
+
+## player post name,other nulls at the start 
+    @app.route('/score', methods= ["POST"])
+    def scores():
+        data = request.json
+        score = data.get("score") if data else None
+        if not score:
+            return {"error": "Score is required"}, 400
+        return {"score": score}
