@@ -33,7 +33,6 @@ def quiz_questions(limit = 5):
         })
     return questions_list
 
-""""""
 def initialize_quiz_table(force=False):
     conn = get_connection()
     cur = conn.cursor() 
@@ -54,7 +53,6 @@ def initialize_quiz_table(force=False):
         count = cur.fetchone()[0]
         if count >= 40 and not force:
             return f"Quiz table already has {count} rows; skipping insert."
-
         if force:
             cur.execute("TRUNCATE TABLE quiz")
             conn.commit()
@@ -75,7 +73,6 @@ def initialize_quiz_table(force=False):
             conn.close()
         except Exception:
             pass
-""""""
 
 def check_answer(correct_choice, user_choice):
     return correct_choice.upper() == user_choice.upper()

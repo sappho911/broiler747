@@ -2,9 +2,16 @@
 // https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript
 
 // const images before canvas is created
-
-
-
+const planeImg = new Image();
+planeImg.src = "../public/img/gameplay_airplane.png";
+const cloudImg = new Image();
+cloudImg.src = "../public/img/cloud.png";
+const birdImg = new Image();
+birdImg.src = "../public/img/bird.png";
+const fuelImg = new Image();
+fuelImg.src = "../public/img/fuel.png";
+const coinImg = new Image();
+coinImg.src = "../public/img/coin.png";
 // canvas, player, obstacles setup
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -17,7 +24,7 @@ const player = {
 };
 let obstacles = [];
 let lastSpawn = 0;
-const spawnInterval = 1200; // ms
+const spawnInterval = 900; // ms
 
 // Game state (not done, need to add fuel and distance from back, 
 // after route is selected from choose airports window)
@@ -29,19 +36,26 @@ let running = true;
 const weatherTypes = ["Sunny", "Cloudy", "Rainy"];
 const weather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
 document.getElementById("weather").textContent = weather;
-
 // Input keys
 let keys = {};
 document.addEventListener("keydown", (e) => keys[e.key] = true);
 document.addEventListener("keyup", (e) => keys[e.key] = false);
 
 function spawnObstacle() {
+    const types = ["cloud", "bird", "fuel"];
+    const type = types[Math.floor(Math.random() * types.length)];
+    let img;
+    if (type === "cloud") img = cloudImg;
+    if (type === "bird") img = birdImg;
+    if (type === "fuel") img = fuelImg;
     obstacles.push({
+        type,
+        img,
         x: canvas.width,
-        y: Math.random() * (canvas.height - 40),
-        width: 40,
-        height: 40,
-        speed: weather === "Rainy" ? 5 : 3
+        y: Math.random() * (canvas.height - 50),
+        width: type === "bird" ? 20 : type === "cloud" ? 100 : type === "fuel" ? 50 : 50,
+        height: type === "bird" ? 20 : type === "cloud" ? 50 : type === "fuel" ? 50 : 50,
+        speed: type === "bird" ? 5 : type === "cloud" ? 2 :  type === "fuel" ? 3 : 0
     });
 }
 // Collision detection - only one hit
@@ -74,18 +88,17 @@ function gameLoop(timestamp) {
     // Player movement
     if (keys["ArrowUp"] && player.y > 0) player.y -= player.speed;
     if (keys["ArrowDown"] && player.y < canvas.height - player.height) player.y += player.speed;
-    // Draw player (change to images, instead of rect drawImage)
-    ctx.fillStyle = "yellow";
-    ctx.fillRect(player.x, player.y, player.width, player.height);
+    // Draw player (image is scuffed, but fine)
+    ctx.drawImage(planeImg, player.x, player.y, player.width, player.height);
     if (timestamp - lastSpawn > spawnInterval) {
         spawnObstacle();
         lastSpawn = timestamp;
     }
     // Update obstacles (change to certain images - clouds, birds, etc)
     obstacles.forEach((obstacle) => {
+        // obstacle movement to the left
         obstacle.x -= obstacle.speed;
-        ctx.fillStyle = "red";
-        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        ctx.drawImage(obstacle.img, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
         if (rectCollision(player, obstacle)) {
             endGame();
         }
