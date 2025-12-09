@@ -90,6 +90,6 @@ def register_routes(app):
         score = data.get("score") if data else None
         if not score:
             return {"error": "Score is required"}, 400
-        return {"score": score}
-    
+        else:
+            return {"score": score}
     return app
