@@ -7,10 +7,9 @@ def get_connection():
     port= 3306,
     database= "flight_game",
     user= "root",
-    password= "2004",
+    password= "tishchuk6370",
     autocommit = True
 )
-
 
 def quiz_questions(limit = 5):
     conn = get_connection()
@@ -34,7 +33,7 @@ def quiz_questions(limit = 5):
         })
     return questions_list
 
-
+""""""
 def initialize_quiz_table(force=False):
     conn = get_connection()
     cur = conn.cursor() 
@@ -76,7 +75,7 @@ def initialize_quiz_table(force=False):
             conn.close()
         except Exception:
             pass
-
+""""""
 
 def check_answer(correct_choice, user_choice):
     return correct_choice.upper() == user_choice.upper()
@@ -89,7 +88,7 @@ def initialize_player_table():
         cur.execute("""
             CREATE TABLE IF NOT EXISTS player (
                 Name VARCHAR(255) PRIMARY KEY,
-                weather VARCHAR(50),
+                weather VARCHAR(50 NULL,
                 Easy_Score INT(11) NULL DEFAULT NULL,
 	            Medium_Score INT(11) NULL DEFAULT NULL,
 	            Hard_Score INT(11) NULL DEFAULT NULL

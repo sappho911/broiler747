@@ -1,6 +1,6 @@
 # api file adding code soon
 import random
-from api.SEED  import quiz_questions, initialize_quiz_table
+from api.SEED  import quiz_questions, initialize_quiz_table, get_connection
 from model.airport import Select_weather
 from flask import jsonify, request
 
@@ -30,7 +30,19 @@ def register_routes(app):
         refueled = random.choice([True, False])
         return {"refueled": refueled}
 
-        
+    @app.route("/api/players", methods=["GET"])
+    def playersfetcher():
+        conn = get_connection()
+        cursor = conn.cursor()
+        query = "SELECT screen_name FROM game"
+        cursor.execute(query)
+        results = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        # Convert list of tuples into JSON objects
+        players = [{"name": row[0]} for row in results]
+        return jsonify(players)    
+    
     @app.route('/api/<name>', methods=['GET'])
     def userfetcher(name):
         try:
