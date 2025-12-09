@@ -128,9 +128,8 @@ function endGame() {
 function winGame() {
     running = false;
     alert("Arrived! Moving to quiz...");
-    window.location.href = "quiz.html";
+    window.location.href = "Quiz.html";
 }
-
 // Pause button
 document.getElementById("pauseButton").addEventListener("click", () => {
     running = !running;

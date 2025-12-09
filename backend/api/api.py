@@ -34,7 +34,7 @@ def register_routes(app):
     def playersfetcher():
         conn = get_connection()
         cursor = conn.cursor()
-        query = "SELECT screen_name FROM game"
+        query = "SELECT Player_Name FROM player"
         cursor.execute(query)
         results = cursor.fetchall()
         cursor.close()
@@ -84,6 +84,20 @@ def register_routes(app):
     @app.route('/ending_airport', methods= ["POST"])
 
 ## player post name,other nulls at the start 
+    @app.route('/new_player', methods=['POST'])
+    def new_player():
+        data = request.json
+        name = data.get("name") 
+        if not data or 'name' not in data: 
+            return {'error': 'Name is required'}, 400
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO player (Player_Name) VALUES (%s)', (request.json['name'],))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return {'message': 'New player added successfully'}, 201
+        
     @app.route('/score', methods= ["POST"])
     def scores():
         data = request.json

@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const playerName = localStorage.getItem("selectedPlayer");
+    const playerName = sessionStorage.getItem("selectedPlayer");
     const playerSlot = document.getElementById("player_name");
 
     if (playerName) {
