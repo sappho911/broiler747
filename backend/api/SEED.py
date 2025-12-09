@@ -84,8 +84,7 @@ def initialize_player_table():
     try:
         cur.execute("""
             CREATE TABLE IF NOT EXISTS player (
-                Name VARCHAR(255) PRIMARY KEY,
-                weather VARCHAR(50 NULL,
+                Player_Name VARCHAR(50) PRIMARY KEY,
                 Easy_Score INT(11) NULL DEFAULT NULL,
 	            Medium_Score INT(11) NULL DEFAULT NULL,
 	            Hard_Score INT(11) NULL DEFAULT NULL

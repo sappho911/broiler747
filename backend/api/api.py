@@ -81,7 +81,6 @@ def register_routes(app):
         except Exception as e:
             return {"error": str(e)}, 500
     
-    return app
     @app.route('/ending_airport', methods= ["POST"])
 
 ## player post name,other nulls at the start 
@@ -92,3 +91,5 @@ def register_routes(app):
         if not score:
             return {"error": "Score is required"}, 400
         return {"score": score}
+    
+    return app
