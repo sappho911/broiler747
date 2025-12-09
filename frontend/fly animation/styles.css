@@ -1,0 +1,13 @@
+#map {
+  height: 180px;
+  width: 600px;
+}
+
+.plane-emoji {
+  font-size: 32px;
+  line-height: 32px;
+  text-align: center;
+
+  image-rendering: pixelated;
+  transform: scale(1.2);
+}
