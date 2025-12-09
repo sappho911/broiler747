@@ -42,7 +42,18 @@ def register_routes(app):
         # Convert list of tuples into JSON objects
         players = [{"name": row[0]} for row in results]
         return jsonify(players)    
-    
+    @app.route("/api/players/stats", methods=["GET"])
+    def playerstats():
+        conn = get_connection()
+        cursor = conn.cursor()
+        query = "SELECT Player_Name, Easy_Score, Medium_Score, Hard_Score FROM player"
+        cursor.execute(query)
+        results = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        stats = [{"name": row[0], "easy_score": row[1], "medium_score": row[2], "hard_score": row[3]} for row in results]
+        return jsonify(stats)
+
     @app.route('/api/<name>', methods=['GET'])
     def userfetcher(name):
         try:
