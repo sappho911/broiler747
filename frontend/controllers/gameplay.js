@@ -45,7 +45,9 @@ function spawnObstacle() {
     });
 }
 // Collision detection - only one hit
+// ref - https://chriscourses.com/blog/coding-collision-detection-in-javascript
 // ref - https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript/Collision_detection
+// comparing object positons and their width and height
 function rectCollision(a, b) {
     return (
         a.x < b.x + b.width && a.x + a.width > b.x &&
@@ -98,6 +100,7 @@ function gameLoop(timestamp) {
     document.getElementById("distance").textContent = distance.toFixed(1);
     if (fuel <= 0) endGame();
     if (distance <= 0) winGame();
+    // requestAnimationFrame to create an animation loop
     requestAnimationFrame(gameLoop);
 }
 
