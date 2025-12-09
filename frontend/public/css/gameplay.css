@@ -53,6 +53,16 @@ body {
     image-rendering: pixelated;
 }
 
+.plane-emoji {
+  font-size: 32px;
+  line-height: 32px;
+  text-align: center;
+
+  image-rendering: pixelated;
+  transform: scale(1.2);
+}
+
+
 /* Pause button */
 #pauseButton {
     padding: 10px;
