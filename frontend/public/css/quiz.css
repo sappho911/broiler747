@@ -11,12 +11,14 @@
     display: flex;
 }
 .quiz-modal {
-    background: white;
-    padding: 24px;
-    width: 90%;
-    max-width: 420px;
-    border-radius: 16px;
-    text-align: center;
+    max-height: 90vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.options-container {
+    flex-grow: 1;
 }
 .timer {
     margin: 10px 0;

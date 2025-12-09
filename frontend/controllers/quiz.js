@@ -100,6 +100,9 @@ document.addEventListener("DOMContentLoaded", () => {
     //Show the results\\
     const showResults = () => {
         clearInterval(timerId);
+        const timerDiv = document.querySelector(".timer");
+        if (timerDiv) timerDiv.style.display = "none"; // Hide entire timer div
+        
         qText.textContent = `Score: ${score} / ${questions.length}`;
         optionsBox.innerHTML = "";
         nextBtn.style.display = "none";
@@ -127,7 +130,27 @@ document.addEventListener("DOMContentLoaded", () => {
             div.appendChild(ul);
             optionsBox.appendChild(div);
         });
+    };    
+    const scoresender = async () => {
+        try {
+            const response = await fetch("http://localhost:5000/score", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    score: score,
+                    total: questions.length
+                })
+            });
+            if (!response.ok) throw new Error("Failed to send score");
+            console.log("Score sent successfully");
+        }
+        catch (err) {
+            console.error("Error sending score:", err);
+        }
     };
     //Run the quiz\\
     loadQuiz();
+    scoresender();
 });
