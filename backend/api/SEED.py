@@ -88,7 +88,6 @@ def initialize_player_table():
                 Easy_Score INT(11) NULL DEFAULT NULL,
 	            Medium_Score INT(11) NULL DEFAULT NULL,
 	            Hard_Score INT(11) NULL DEFAULT NULL
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
         conn.commit()

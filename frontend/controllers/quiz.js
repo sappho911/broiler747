@@ -144,11 +144,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 total: questions.length
             })
         });
-
         if (!response.ok) {
             throw new Error("Failed to send score");
         }
-
         const data = await response.json();
         console.log("Score sent successfully:", data);
 
@@ -156,6 +154,5 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Error sending score:", err);
     }
 };
-    //Run the quiz\\
     loadQuiz();
 });

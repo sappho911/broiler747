@@ -7,28 +7,38 @@
 }
 
 body {
-  background-color: #000;
   background-image: url('../img/sky-loop.gif');
+  background-size: cover;
+  background-repeat: repeat;
+  background-position: center;
+  background-attachment: fixed;
+
   font-family: 'VT323', monospace;
+  color: #ffffff;
+  image-rendering: pixelated;
+
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  color: #ffffff;
-  overflow: hidden;
-  image-rendering: -webkit-optimize-contrast;
-  -ms-interpolation-mode: nearest-neighbor;
 }
 
+main {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
 
-/*Pixel style container box*/
 .pixel-frame {
   background-color: #111;
-  border: 6px solid #ffcc00;       
-  border-radius: 0;
-  padding: 24px 16px;
-  display: inline-block;
-  box-shadow: 0 0 0 2px #000;
+  border: 6px solid #55aaff; 
+  padding: 24px 18px;
+  width: 100%;
+  text-align: center;
+  position: relative;
   image-rendering: pixelated;
 }
 
@@ -39,69 +49,48 @@ body {
   left: -4px;
   right: -4px;
   bottom: -4px;
-  border: 2px solid #ff6600;
+  border: 2px solid #0d3a55;
   pointer-events: none;
 }
 
-
-main {
-  text-align: center;
-  width: 100%;
-  max-width: 400px;
-  padding: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  box-sizing: border-box;
-}
-
 #player_name {
-  font-size: 32px;
-  margin-bottom: 30px;
+  font-size: 36px;
   color: #ffcc00;
   text-shadow: 2px 2px 0 #cc6600;
-  letter-spacing: 2px;
+  margin-bottom: 30px;
+  letter-spacing: 3px;
+  image-rendering: pixelated;
 }
+
 
 .main-menu {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
-
 .main-menu button {
   font-family: 'VT323', monospace;
   font-size: 24px;
+  padding: 12px 0;
   color: #000;
-  text-align: center;
-  letter-spacing: 1px;
-
-  /* Button appearance */
-  background-color: #44cc66;
-  border: 4px solid #228833;
-  border-radius: 0;
-  padding: 14px 0;
-
-  /* Disable anti-aliasing */
-  -webkit-font-smoothing: none;
-  -moz-osx-font-smoothing: grayscale;
-  image-rendering: pixelated;
+  background: #ff66aa;
+  border: 4px solid #cc3388;
   cursor: pointer;
-  outline: none;
-  transition: none;
+  letter-spacing: 2px;
+  image-rendering: pixelated;
+  width: 100%;
 }
+
 .main-menu button:hover {
-  background-color: #66ff88;
+  background: #ff99cc;
 }
 
 .main-menu button:active {
   transform: translate(2px, 2px);
-  border-color: #005522;
-  background-color: #33aa55;
+  border-color: #990055;
 }
 
-.main-menu button:focus {
-  outline: 2px solid #ffdd00;
-  outline-offset: 2px;
+.main-menu button a {
+  text-decoration: none;
+  color: #000;
 }
