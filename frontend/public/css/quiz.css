@@ -1,71 +1,191 @@
-.quizOverlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.662);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-.quizOverlay.show {
-    display: flex;
-}
-.quiz-modal {
-    max-height: 90vh;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.options-container {
-    flex-grow: 1;
+body {
+  background-image: url('../img/sky-loop.gif');
+
+  font-family: 'VT323', monospace;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  min-height: 100vh;
+  color: #ffffff;
+  overflow: hidden;
+
+  image-rendering: pixelated;
+}
+
+.pixel-frame {
+  position: relative;
+  background-color: #111;
+  border: 6px solid #ffcc00;
+  padding: 24px 16px;
+  display: inline-block;
+  box-shadow: 0 0 0 2px #000;
+  image-rendering: pixelated;
+}
+
+.pixel-frame::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 2px solid #ff6600;
+  pointer-events: none;
+}
+
+main {
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  min-height: 100vh;
+}
+
+#player_name {
+  font-size: 32px;
+  margin-bottom: 30px;
+  color: #ffcc00;
+  text-shadow: 2px 2px 0 #cc6600;
+  letter-spacing: 2px;
+}
+
+.main-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.main-menu button {
+  font-family: 'VT323', monospace;
+  font-size: 24px;
+  color: #000;
+  letter-spacing: 1px;
+
+  background-color: #44cc66;
+  border: 4px solid #228833;
+  padding: 14px 0;
+
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  image-rendering: pixelated;
+
+  cursor: pointer;
+  outline: none;
+}
+
+.main-menu button:hover {
+  background-color: #66ff88;
+}
+
+.main-menu button:active {
+  transform: translate(2px, 2px);
+  border-color: #005522;
+  background-color: #33aa55;
+}
+
+.main-menu button:focus {
+  outline: 2px solid #ffdd00;
+  outline-offset: 2px;
+}
+body {
+  font-size: 22px;
+  line-height: 1.4;
+}
+.quizOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.quiz-modal {
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+}
+.question-box {
+  background-color: #1b1b1b;
+  border: 4px solid #00e5ff;
+  padding: 18px 16px;
+  margin-bottom: 18px;
+
+  font-size: 26px;
+  color: #ffffff;
+
+  box-shadow:
+    0 0 0 2px #000,
+    inset 0 0 0 2px #003344;
+
+  text-shadow: 1px 1px 0 #000;
 }
 .timer {
-    margin: 10px 0;
-    font-weight: 600;
+  font-size: 20px;
+  margin-bottom: 16px;
+  color: #ffcc00;
 }
 .options-container {
-    display: grid;
-    gap: 10px;
-    margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 16px;
 }
 .option {
-    padding: 12px;
-    border: 2px solid #dde1eadc;
-    border-radius: 10px;
-    cursor: pointer;
-    text-align: left;
-    transition: 0.2s;
+  background-color: #222;
+  border: 4px solid #ffcc00;
+  padding: 14px 10px;
+
+  font-family: 'VT323', monospace;
+  font-size: 24px;
+  color: #ffffff;
+
+  cursor: pointer;
+  text-align: center;
+
+  box-shadow:
+    0 0 0 2px #000,
+    inset 0 0 0 2px #664400;
+
+  text-shadow: 1px 1px 0 #000;
 }
+
 .option:hover {
-    background: #fafafae4;
+  background-color: #333;
 }
-.option.correct {
-    background: #dcfce7;
-    border-color: #01fa5c;
-}
-.option.wrong {
-    background: #fee2e2;
-    border-color: #fa0707;
-}
-.option.disabled {
-    pointer-events: none;
-    opacity: 0.6;
+
+.option:active {
+  transform: translate(2px, 2px);
+  border-color: #ffaa00;
 }
 .feedback {
-    min-height: 24px;
-    font-weight: 600;
+  font-size: 20px;
+  margin: 10px 0;
+  min-height: 24px;
 }
 .primary {
-    margin-top: 12px;
-    padding: 10px;
-    width: 100%;
-    border-radius: 10px;
-    border: none;
-    background: #336699;
-    color: white;
-    font-size: 14px;
+  font-family: 'VT323', monospace;
+  font-size: 24px;
+
+  background-color: #44cc66;
+  border: 4px solid #228833;
+  padding: 12px 0;
+  width: 100%;
+
+  cursor: pointer;
 }
-.hidden {
-    display: none;
+
+.primary:hover {
+  background-color: #66ff88;
 }
