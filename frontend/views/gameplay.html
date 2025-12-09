@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gameplay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../public/css/gameplay.css">
+    <script src="../controllers/gameplay.js" type="module" defer></script>
+</head>
+<body>
+
+<div id="center-wrapper">
+    <div id="game-container">
+        <canvas id="gameCanvas" width="900" height="500"></canvas>
+        <div id="sidebar">
+            <h3>FLIGHT INFO</h3>
+            <div id="minimap"></div>
+            <p>Fuel: <span id="fuel">100</span>%</p>
+            <p>Distance: <span id="distance">100</span> km</p>
+            <p>Weather: <span id="weather"></span></p>
+            <button id="pauseButton">PAUSE</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>
