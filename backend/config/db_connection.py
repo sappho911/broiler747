@@ -1,8 +1,5 @@
-DB_CONFIG = {
-    "host": "127.0.0.1",
-    "port": 3306,
-    "database": "flight_game",
-    "user": "valera",
-    "password": "loh",
-    "autocommit": True
-}
+import mysql.connector
+from config.db_config import DB_CONFIG
+
+def get_connection():
+    return mysql.connector.connect(**DB_CONFIG)
