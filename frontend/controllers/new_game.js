@@ -106,7 +106,6 @@ function calculateDistance() {
     distanceValue.textContent = km.toFixed(2);
     updateDifficultyBadge(difficulty);
 }
-
 function updateDifficultyBadge(difficulty) {
     difficultyBadge.textContent = difficulty || "--";
     difficultyBadge.className = "difficulty-badge";
@@ -119,7 +118,6 @@ function updateDifficultyBadge(difficulty) {
         difficultyBadge.classList.add("hard");
     }
 }
-
 weatherButtons.forEach(btn => {
     btn.addEventListener("click", () => {
         weatherButtons.forEach(b => b.classList.remove("selected"));
@@ -138,7 +136,6 @@ function checkCanStartGame() {
         startGameBtn.disabled = true;
     }
 }
-
 function getCurrentDistanceAndDifficulty() {
     if (!selectedStartAirport || !selectedEndAirport) return { km: 0, difficulty: "easy" };
     const km = calculateDistanceLocal(
@@ -155,19 +152,23 @@ startGameBtn.addEventListener("click", async () => {
         return;
     }
     
-    let playerName = sessionStorage.getItem("selectedPlayer");
+    let playerName = sessionStorage.getItem("selectedPlayer") || localStorage.getItem("playerName");
     if (!playerName) {
         playerName = prompt("Enter your player name:");
         if (playerName) {
+            localStorage.setItem("playerName", playerName);
             sessionStorage.setItem("playerName", playerName);
         } else {
             alert("Player name is required!");
             return;
         }
+    } else {
+        // Make sure it's in localStorage for gameplay.js
+        // That was a debatable decision
+        localStorage.setItem("playerName", playerName);
     }
     
     const { km, difficulty } = getCurrentDistanceAndDifficulty();
-    
     try {
         const response = await fetch(`${API_BASE}/save_game`, {
             method: "POST",
@@ -184,24 +185,28 @@ startGameBtn.addEventListener("click", async () => {
         
         const data = await response.json();
         
-        sessionStorage.setItem("currentGame", JSON.stringify({
+        const gameData = {
             startAirport: selectedStartAirport.code,
             endAirport: selectedEndAirport.code,
             weather: selectedWeather,
             distance: km,
             difficulty: difficulty
-        }));
+        };
+        sessionStorage.setItem("currentGame", JSON.stringify(gameData));
+        localStorage.setItem("currentGame", JSON.stringify(gameData));
         
         window.location.href = "gameplay.html";
     } catch (error) {
         console.error("Error starting game:", error);
-        sessionStorage.setItem("currentGame", JSON.stringify({
+        const gameData = {
             startAirport: selectedStartAirport.code,
             endAirport: selectedEndAirport.code,
             weather: selectedWeather,
             distance: km,
             difficulty: difficulty
-        }));
+        };
+        sessionStorage.setItem("currentGame", JSON.stringify(gameData));
+        localStorage.setItem("currentGame", JSON.stringify(gameData));
         window.location.href = "gameplay.html";
     }
 });

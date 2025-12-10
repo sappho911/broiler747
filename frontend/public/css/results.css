@@ -75,14 +75,14 @@ main {
   background: #0a0a1a;
   border: 4px solid #336699;
   padding: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   text-align: left;
 }
 
 .result-box h2 {
   color: #55aaff;
   font-size: 24px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   letter-spacing: 1px;
   text-align: center;
 }
@@ -90,9 +90,9 @@ main {
 .stat-row {
   display: flex;
   justify-content: space-between;
-  padding: 6px 0;
+  padding: 8px 0;
   border-bottom: 1px dashed #335577;
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .stat-row:last-child {
@@ -127,62 +127,7 @@ main {
   color: #ff4444;
 }
 
-/* Score Box */
-.score-box {
-  background: #0a0a1a;
-  border: 4px solid #ffcc00;
-  padding: 16px;
-  margin-bottom: 20px;
-}
-
-.score-box h2 {
-  color: #ffcc00;
-  font-size: 24px;
-  margin-bottom: 12px;
-  letter-spacing: 1px;
-}
-
-.score-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 2px dashed #333;
-  font-size: 20px;
-}
-
-.score-row:last-child {
-  border-bottom: none;
-}
-
-.score-row .score-label {
-  color: #aaffff;
-}
-
-.score-row .score-value {
-  color: #44ff44;
-  text-shadow: 1px 1px 0 #00aa00;
-}
-
-.score-row.total {
-  margin-top: 8px;
-  padding-top: 12px;
-  border-top: 3px solid #ffcc00;
-  border-bottom: none;
-  font-size: 28px;
-}
-
-.score-row.total .score-label {
-  color: #ffcc00;
-}
-
-.score-row.total .score-value {
-  color: #ffcc00;
-  text-shadow: 2px 2px 0 #aa8800;
-  font-size: 32px;
-}
-
-/* Buttons */
+/* Buttons - match main_menu style */
 .button-row {
   display: flex;
   flex-direction: column;
@@ -194,8 +139,8 @@ main {
   font-size: 24px;
   padding: 12px 0;
   color: #000;
-  background: #ff66aa;
-  border: 4px solid #cc3388;
+  background: #44cc66;
+  border: 4px solid #228833;
   cursor: pointer;
   letter-spacing: 2px;
   image-rendering: pixelated;
@@ -203,24 +148,41 @@ main {
 }
 
 .button-row button:hover {
-  background: #ff99cc;
+  background: #66ff88;
 }
 
 .button-row button:active {
   transform: translate(2px, 2px);
+  border-color: #005522;
+  background: #33aa55;
+}
+
+#quiz-btn {
+  background: #ff66aa;
+  border-color: #cc3388;
+  color: #000;
+}
+
+#quiz-btn:hover {
+  background: #ff99cc;
+}
+
+#quiz-btn:active {
+  transform: translate(2px, 2px);
   border-color: #990055;
 }
 
-#play-again-btn {
-  background: #44cc66;
-  border-color: #228833;
+#main-menu-btn {
+  background: #55aaff;
+  border-color: #336699;
+  color: #000;
 }
 
-#play-again-btn:hover {
-  background: #66ff88;
+#main-menu-btn:hover {
+  background: #88ccff;
 }
 
-#play-again-btn:active {
+#main-menu-btn:active {
   transform: translate(2px, 2px);
-  border-color: #005522;
+  border-color: #224466;
 }

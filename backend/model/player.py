@@ -12,7 +12,6 @@ class Player:
         self.score += points
         return self.score
     
-    
     def game_diff(self, difficulty):
         if difficulty == "easy":
             self.easy_score = self.score / 6
@@ -21,9 +20,6 @@ class Player:
         elif difficulty == "hard":
             self.hard_score = self.score / 2
         return self.score
-    
- 
-  
     
     def get_status(self):
         return {

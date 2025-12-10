@@ -130,30 +130,15 @@ document.addEventListener("DOMContentLoaded", () => {
             div.appendChild(ul);
             optionsBox.appendChild(div);
         });
-        scoresender();
+        
+        // Store score in sessionStorage before redirecting
+        sessionStorage.setItem("quizScore", JSON.stringify({
+            score: score,
+            total: questions.length
+        }));
+        
+        // Don't send score here - final_window.js will send the combined score
         window.location.href = "../views/final_window.html"
     };    
-    const scoresender = async () => {
-    try {
-        const response = await fetch("http://localhost:5000/score", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                score: score,
-                total: questions.length
-            })
-        });
-        if (!response.ok) {
-            throw new Error("Failed to send score");
-        }
-        const data = await response.json();
-        console.log("Score sent successfully:", data);
-
-    } catch (err) {
-        console.error("Error sending score:", err);
-    }
-};
     loadQuiz();
 });

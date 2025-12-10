@@ -9,17 +9,18 @@ def get_connection():
         port=3306,
         database="flight_game",
         user="root",
-        password="tishchuk6370",
+        password="2004",
         autocommit=True
     )
 
 class Game:
-    def __init__(self, player_name, start_airport, ending_airport, weather, distance):
+    def __init__(self, player_name, start_airport, ending_airport, weather, distance, difficulty=None):
         self.player = Player(player_name, 0, 0, 0)
         self.start_airport = start_airport
         self.ending_airport = ending_airport
         self.weather = weather
         self.distancee = distance
+        self.difficulty = difficulty
 
         
     def distance(self,start_airport,ending_airport): 
@@ -65,9 +66,8 @@ class Game:
                 insert_player_sql = "INSERT INTO player (Player_Name, Easy_Score, Medium_Score, Hard_Score) VALUES (%s, %s, %s, %s)"
                 cursor.execute(insert_player_sql, (self.player.player_name, 0, 0, 0))
             
-            # Now save the game
-            insert_sql = "INSERT INTO game (weather, player_name, start_airport, ending_airport, distancee ) VALUES (%s, %s, %s, %s, %s)"
-            cursor.execute(insert_sql, (self.weather, self.player.player_name, self.start_airport, self.ending_airport, self.distancee))
+            insert_sql = "INSERT INTO game (weather, player_name, start_airport, ending_airport, distancee, difficulty) VALUES (%s, %s, %s, %s, %s, %s)"
+            cursor.execute(insert_sql, (self.weather, self.player.player_name, self.start_airport, self.ending_airport, self.distancee, self.difficulty))
             conn.commit()
             cursor.close()
             conn.close()
