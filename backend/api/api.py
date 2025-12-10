@@ -129,15 +129,11 @@ def register_routes(app):
     @app.route("/seed_quiz", methods=["GET"])
     def seed_quiz(): 
         return {"questions": quiz_questions(5)}
-
-
+    
     @app.route('/refuel', methods=['POST'])
     def refuel():
         refueled = random.choice([True, False])
         return {"refueled": refueled}
-
-
-
     @app.route("/start_game", methods=["POST"])
     def start_game():
         data = request.json
@@ -150,7 +146,30 @@ def register_routes(app):
             return {"message": f"Game started for {name}"}
         except Exception as e:
             return {"error": str(e)}, 500
+          
+    @app.route("/api/players", methods=["GET"])
+    def playersfetcher():
+        conn = get_connection()
+        cursor = conn.cursor()
+        query = "SELECT Player_Name FROM player"
+        cursor.execute(query)
+        results = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        players = [{"name": row[0]} for row in results]
+        return jsonify(players)    
     
+    @app.route("/api/players/stats", methods=["GET"])
+    def playerstats():
+        conn = get_connection()
+        cursor = conn.cursor()
+        query = "SELECT Player_Name, Easy_Score, Medium_Score, Hard_Score FROM player"
+        cursor.execute(query)
+        results = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        stats = [{"name": row[0], "easy_score": row[1], "medium_score": row[2], "hard_score": row[3]} for row in results]
+        return jsonify(stats)
 
     @app.route('/ending_airport', methods= ["POST"])
     ## we gonna get here the ending airport from the user
@@ -159,9 +178,22 @@ def register_routes(app):
         ending_airport = data.get("ending_airport") if data else None
         if not ending_airport:
             return {"error": "Ending airport is required"}, 400
-        return {"ending_airport": ending_airport} ## kys
-
-## player post name,other nulls at the start 
+        return {"ending_airport": ending_airport}
+    ## player post name,other nulls at the start 
+    @app.route('/new_player', methods=['POST'])
+    def new_player():
+        data = request.json
+        name = data.get("name") 
+        if not data or 'name' not in data: 
+            return {'error': 'Name is required'}, 400
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO player (Player_Name) VALUES (%s)', (request.json['name'],))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return {'message': 'New player added successfully'}, 201
+        
     @app.route('/score', methods= ["POST"])
     def scores():
         data = request.json
@@ -169,15 +201,13 @@ def register_routes(app):
         if not score:
             return {"error": "Score is required"}, 400
         return {"score": score}
+      
     @app.route('/crashed', methods= ["POST"])
     def crashed():
         data = request.json
         crashed = data.get("crashed") if data else None
         if not crashed:
             return {"error": "Crashed status is required"}, 400
-        return {"crashed": crashed} 
-    
-
-        
+        return {"crashed": crashed}      
         
     return app
