@@ -29,25 +29,9 @@ const spawnInterval = 900; // ms
 // Game state (distance from back, 
 // after route is selected from choose airports window)
 let fuel = 100;
-let distance = null; 
-let running = false;
-// Fetch distance from backend 
-async function fetchDistance() {
-    try {
-        const response = await fetch("http://127.0.0.1:5000/api/distance"); 
-        const data = await response.json();
-        distance = data.distance; 
-        document.getElementById("distance").textContent = distance.toFixed(1);
-        console.log("Loaded distance:", distance);
-    } catch (error) {
-        console.error("Failed to fetch distance:", error);
-        // fallback value so gameplay still works
-        distance = 100;
-        document.getElementById("distance").textContent = distance;
-    }
-    running = true;
-}
-fetchDistance();
+let distance = sessionStorage.getItem("currentGame") ?
+    JSON.parse(sessionStorage.getItem("currentGame")).distance : 100; 
+let running = true;
 // Game running state
 // Weather (up to update, need weather from previous window - airport selection)
 const weatherTypes = ["Sunny", "Cloudy", "Rainy"];

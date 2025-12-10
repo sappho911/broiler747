@@ -1,4 +1,3 @@
-
 import mysql.connector
 from config.db_config import DB_CONFIG
 

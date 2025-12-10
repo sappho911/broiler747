@@ -7,7 +7,7 @@ def get_connection():
     port= 3305,
     database= "flight_game",
     user= "root",
-    password= "2004",
+    password= "tishchuk6370",
     autocommit = True
 )
 def quiz_questions(limit = 5):
