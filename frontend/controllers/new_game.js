@@ -155,15 +155,19 @@ startGameBtn.addEventListener("click", async () => {
         return;
     }
     
-    let playerName = sessionStorage.getItem("selectedPlayer");
+    let playerName = sessionStorage.getItem("selectedPlayer") || localStorage.getItem("playerName");
     if (!playerName) {
         playerName = prompt("Enter your player name:");
         if (playerName) {
+            localStorage.setItem("playerName", playerName);
             sessionStorage.setItem("playerName", playerName);
         } else {
             alert("Player name is required!");
             return;
         }
+    } else {
+        // Make sure it's in localStorage for gameplay.js
+        localStorage.setItem("playerName", playerName);
     }
     
     const { km, difficulty } = getCurrentDistanceAndDifficulty();
@@ -184,24 +188,28 @@ startGameBtn.addEventListener("click", async () => {
         
         const data = await response.json();
         
-        sessionStorage.setItem("currentGame", JSON.stringify({
+        const gameData = {
             startAirport: selectedStartAirport.code,
             endAirport: selectedEndAirport.code,
             weather: selectedWeather,
             distance: km,
             difficulty: difficulty
-        }));
+        };
+        sessionStorage.setItem("currentGame", JSON.stringify(gameData));
+        localStorage.setItem("currentGame", JSON.stringify(gameData));
         
         window.location.href = "gameplay.html";
     } catch (error) {
         console.error("Error starting game:", error);
-        sessionStorage.setItem("currentGame", JSON.stringify({
+        const gameData = {
             startAirport: selectedStartAirport.code,
             endAirport: selectedEndAirport.code,
             weather: selectedWeather,
             distance: km,
             difficulty: difficulty
-        }));
+        };
+        sessionStorage.setItem("currentGame", JSON.stringify(gameData));
+        localStorage.setItem("currentGame", JSON.stringify(gameData));
         window.location.href = "gameplay.html";
     }
 });

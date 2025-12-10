@@ -1,6 +1,5 @@
 import { getPlayers } from "../model/players.js";
 
-// Runs when the page is fully loaded
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         const players = await getPlayers();
@@ -15,7 +14,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 alert("Please select a player first!");
             }
         });
-        // "CREATE NEW PLAYER" button
         newPlayerBtn.addEventListener("click", () => {
             window.location.href = "../views/new_player.html";
         });
@@ -27,7 +25,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 });
 
-// Creates and attaches the player list to the DOM
 function makePlayerList(players) {
     const playerList = document.getElementById("player_list");
     playerList.innerHTML = "";

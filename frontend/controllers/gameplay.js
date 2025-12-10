@@ -119,40 +119,111 @@ function gameLoop(timestamp) {
 }
 requestAnimationFrame(gameLoop);
 
-// sending data results to back, to further 
-async function sendGameResult(result) {
+//
+
+// Send crashed status to backend
+async function sendCrashed() {
+    const currentGame = JSON.parse(localStorage.getItem("currentGame")) || JSON.parse(sessionStorage.getItem("currentGame")) || {};
+    const difficulty = currentGame.difficulty || "easy";
+    const totalDistance = currentGame.distance || 100;
+    const distanceTraveled = totalDistance - distance;
+    const percentCompleted = (distanceTraveled / totalDistance) * 100;
+    const partialScore = Math.round(percentCompleted / 10); // 0-10 points based on progress
+    
     try {
-        const response = await fetch("http://127.0.0.1:5000/api/game_result", {
+        const response = await fetch("http://127.0.0.1:5000/crashed", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                player_name: sessionStorage.getItem("selected_player_name"),
-                result: result,
+                crashed: true,
+                player_name: localStorage.getItem("playerName"),
                 fuel_left: fuel.toFixed(1),
-                distance_left: distance.toFixed(1)
+                distance_left: distance.toFixed(1),
+                difficulty: difficulty,
+                score: partialScore
             })
         });
         const data = await response.json();
-        console.log("Result saved:", data);
+        console.log("Crashed status sent:", data);
+        
+        // Store result in sessionStorage for Results page
+        sessionStorage.setItem("gameResult", JSON.stringify({
+            crashed: true,
+            won: false,
+            fuel_left: fuel.toFixed(1),
+            distance_left: distance.toFixed(1),
+            weather: weather
+        }));
+        
     } catch (err) {
-        console.error("ERROR sending game result:", err);
+        console.error("Error sending crashed status:", err);
+        // Still store locally even if backend fails
+        sessionStorage.setItem("gameResult", JSON.stringify({
+            crashed: true,
+            won: false,
+            fuel_left: fuel.toFixed(1),
+            distance_left: distance.toFixed(1),
+            weather: weather
+        }));
     }
 }
 
-
-// Game end conditions, for now alerts and redirect
-// also need to store score data to push it further to next final results window and to backend
-function endGame() {
-    running = false;
-    alert("Crashed! Moving to quiz...");
-    window.location.href = "quiz.html";
+// Send win/score to backend
+async function sendWin() {
+    const currentGame = JSON.parse(localStorage.getItem("currentGame")) || JSON.parse(sessionStorage.getItem("currentGame")) || {};
+    const difficulty = currentGame.difficulty || "easy";
+    
+    try {
+        const response = await fetch("http://127.0.0.1:5000/score", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                score: Math.round(fuel), 
+                player_name: localStorage.getItem("playerName"),
+                won: true,
+                fuel_left: fuel.toFixed(1),
+                difficulty: difficulty
+            })
+        });
+        const data = await response.json();
+        console.log("Win score sent:", data);
+        
+        // Store result in sessionStorage for Results page
+        sessionStorage.setItem("gameResult", JSON.stringify({
+            crashed: false,
+            won: true,
+            fuel_left: fuel.toFixed(1),
+            distance_left: "0",
+            weather: weather
+        }));
+        
+    } catch (err) {
+        console.error("Error sending win score:", err);
+        // Still store locally even if backend fails
+        sessionStorage.setItem("gameResult", JSON.stringify({
+            crashed: false,
+            won: true,
+            fuel_left: fuel.toFixed(1),
+            distance_left: "0",
+            weather: weather
+        }));
+    }
 }
-function winGame() {
+
+// Game end conditions - redirect to Results page
+async function endGame() {
     running = false;
-    alert("Arrived! Moving to quiz...");
-    window.location.href = "Quiz.html";
+    await sendCrashed();
+    window.location.href = "Results.html";
+}
+async function winGame() {
+    running = false;
+    await sendWin();
+    window.location.href = "Results.html";
 }
 // Pause button
 document.getElementById("pauseButton").addEventListener("click", () => {

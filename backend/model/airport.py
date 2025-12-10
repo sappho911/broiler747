@@ -8,13 +8,11 @@ class Airport:
         cursor = connection.cursor()
         cursor.execute(sql)
         res = cursor.fetchall()
-        # print(res)
         if len(res) == 1:
             self.ident = res[0][0]
             self.name = res[0][1]
             self.latitude_deg = res[0][2]
             self.longitude_deg = res[0][3]
-            # print(self.ident, self.name, self.latitude_deg, self.longitude_deg)
 
     def get_random_airports_from_finland(self, limits=3):
         sql = f" SELECT airport.name , airport.iata_code FROM airport INNER JOIN country ON airport.iso_country = country.iso_country WHERE country.name = 'Finland' AND airport.iata_code != '' AND airport.iata_code != 'HEL' ORDER BY RAND() LIMIT {limits}"
