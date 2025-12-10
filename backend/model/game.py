@@ -9,7 +9,7 @@ def get_connection():
         port=3306,
         database="flight_game",
         user="root",
-        password="tishchuk6370",
+        password="2004",
         autocommit=True
     )
 
