@@ -1,7 +1,17 @@
-
-
-
-
+// Fetch Airports data - not working yet for her
+/*
+async function fetchAirports() {
+    try {
+        const response = await fetch(`http://127.0.0.1:5000/airports`);
+        const data = await response.json();
+        airportsData = data.airports || [];
+        return airportsData;
+    } catch (error) {
+        console.error("Error fetching airports:", error);
+        return [];
+    }
+}
+*/
 // Fly Animation
 const map = L.map("minimap").setView([51.505, -0.09], 18);
 

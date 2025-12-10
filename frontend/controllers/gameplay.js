@@ -35,7 +35,10 @@ let running = true;
 // Game running state
 // Weather (up to update, need weather from previous window - airport selection)
 const weatherTypes = ["Sunny", "Cloudy", "Rainy"];
-const weather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
+const currentGame_data = sessionStorage.getItem("currentGame")
+    ? JSON.parse(sessionStorage.getItem("currentGame"))
+    : {};
+const weather = currentGame_data.weather && weatherTypes.includes(currentGame_data.weather)
 document.getElementById("weather").textContent = weather;
 // Input keys
 let keys = {};
@@ -118,8 +121,6 @@ function gameLoop(timestamp) {
     requestAnimationFrame(gameLoop);
 }
 requestAnimationFrame(gameLoop);
-
-//
 
 // Send crashed status to backend
 async function sendCrashed() {

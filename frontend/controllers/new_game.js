@@ -106,7 +106,6 @@ function calculateDistance() {
     distanceValue.textContent = km.toFixed(2);
     updateDifficultyBadge(difficulty);
 }
-
 function updateDifficultyBadge(difficulty) {
     difficultyBadge.textContent = difficulty || "--";
     difficultyBadge.className = "difficulty-badge";
@@ -119,7 +118,6 @@ function updateDifficultyBadge(difficulty) {
         difficultyBadge.classList.add("hard");
     }
 }
-
 weatherButtons.forEach(btn => {
     btn.addEventListener("click", () => {
         weatherButtons.forEach(b => b.classList.remove("selected"));
@@ -138,7 +136,6 @@ function checkCanStartGame() {
         startGameBtn.disabled = true;
     }
 }
-
 function getCurrentDistanceAndDifficulty() {
     if (!selectedStartAirport || !selectedEndAirport) return { km: 0, difficulty: "easy" };
     const km = calculateDistanceLocal(
@@ -167,11 +164,11 @@ startGameBtn.addEventListener("click", async () => {
         }
     } else {
         // Make sure it's in localStorage for gameplay.js
+        // That was a debatable decision
         localStorage.setItem("playerName", playerName);
     }
     
     const { km, difficulty } = getCurrentDistanceAndDifficulty();
-    
     try {
         const response = await fetch(`${API_BASE}/save_game`, {
             method: "POST",
