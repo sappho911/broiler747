@@ -4,13 +4,12 @@ import time
 def get_connection():
     return mysql.connector.connect(
     host= "127.0.0.1",
-    port= 3306,
+    port= 3305,
     database= "flight_game",
     user= "root",
     password= "tishchuk6370",
     autocommit = True
 )
-
 def quiz_questions(limit = 5):
     conn = get_connection()
     cur = conn.cursor()
@@ -33,7 +32,6 @@ def quiz_questions(limit = 5):
         })
     return questions_list
 
-""""""
 def initialize_quiz_table(force=False):
     conn = get_connection()
     cur = conn.cursor() 
@@ -54,7 +52,6 @@ def initialize_quiz_table(force=False):
         count = cur.fetchone()[0]
         if count >= 40 and not force:
             return f"Quiz table already has {count} rows; skipping insert."
-
         if force:
             cur.execute("TRUNCATE TABLE quiz")
             conn.commit()
@@ -75,7 +72,6 @@ def initialize_quiz_table(force=False):
             conn.close()
         except Exception:
             pass
-""""""
 
 def check_answer(correct_choice, user_choice):
     return correct_choice.upper() == user_choice.upper()
@@ -87,12 +83,10 @@ def initialize_player_table():
     try:
         cur.execute("""
             CREATE TABLE IF NOT EXISTS player (
-                Name VARCHAR(255) PRIMARY KEY,
-                weather VARCHAR(50 NULL,
+                Player_Name VARCHAR(50) PRIMARY KEY,
                 Easy_Score INT(11) NULL DEFAULT NULL,
 	            Medium_Score INT(11) NULL DEFAULT NULL,
 	            Hard_Score INT(11) NULL DEFAULT NULL
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
         conn.commit()

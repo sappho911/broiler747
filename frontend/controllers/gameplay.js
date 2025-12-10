@@ -1,10 +1,18 @@
-// main reference used:
+// main references used:
 // https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript
-
+// https://chriscourses.com/blog/coding-collision-detection-in-javascript
 // const images before canvas is created
-
-
-
+const planeImg = new Image();
+planeImg.src = "../public/img/gameplay_airplane.png";
+const cloudImg = new Image();
+cloudImg.src = "../public/img/cloud.png";
+const birdImg = new Image();
+birdImg.src = "../public/img/bird.png";
+const fuelImg = new Image();
+fuelImg.src = "../public/img/fuel.png";
+// didn't end up using coin image, but keeping it for later
+const coinImg = new Image();
+coinImg.src = "../public/img/coin.png";
 // canvas, player, obstacles setup
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -17,37 +25,60 @@ const player = {
 };
 let obstacles = [];
 let lastSpawn = 0;
-const spawnInterval = 1200; // ms
-
-// Game state (not done, need to add fuel and distance from back, 
+const spawnInterval = 900; // ms
+// Game state (distance from back, 
 // after route is selected from choose airports window)
 let fuel = 100;
-let distance = 100;
+let distance = null; 
+let running = false;
+// Fetch distance from backend 
+async function fetchDistance() {
+    try {
+        const response = await fetch("http://127.0.0.1:5000/api/distance"); 
+        const data = await response.json();
+        distance = data.distance; 
+        document.getElementById("distance").textContent = distance.toFixed(1);
+        console.log("Loaded distance:", distance);
+    } catch (error) {
+        console.error("Failed to fetch distance:", error);
+        // fallback value so gameplay still works
+        distance = 100;
+        document.getElementById("distance").textContent = distance;
+    }
+    running = true;
+}
+fetchDistance();
 // Game running state
-let running = true;
 // Weather (up to update, need weather from previous window - airport selection)
 const weatherTypes = ["Sunny", "Cloudy", "Rainy"];
 const weather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
 document.getElementById("weather").textContent = weather;
-
 // Input keys
 let keys = {};
 document.addEventListener("keydown", (e) => keys[e.key] = true);
 document.addEventListener("keyup", (e) => keys[e.key] = false);
 
 function spawnObstacle() {
+    const types = ["cloud", "bird", "fuel"];
+    const type = types[Math.floor(Math.random() * types.length)];
+    let img;
+    if (type === "cloud") img = cloudImg;
+    if (type === "bird") img = birdImg;
+    if (type === "fuel") img = fuelImg;
     obstacles.push({
+        type,
+        img,
         x: canvas.width,
-        y: Math.random() * (canvas.height - 40),
-        width: 40,
-        height: 40,
-        speed: weather === "Rainy" ? 5 : 3
+        y: Math.random() * (canvas.height - 50),
+        width: type === "bird" ? 20 : type === "cloud" ? 100 : type === "fuel" ? 50 : 50,
+        height: type === "bird" ? 20 : type === "cloud" ? 50 : type === "fuel" ? 50 : 50,
+        speed: type === "bird" ? 5 : type === "cloud" ? 2 :  type === "fuel" ? 3 : 0
     });
 }
 // Collision detection - only one hit
 // ref - https://chriscourses.com/blog/coding-collision-detection-in-javascript
 // ref - https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript/Collision_detection
-// comparing object positons and their width and height
+// comparing object's positions and their width and height
 function rectCollision(a, b) {
     return (
         a.x < b.x + b.width && a.x + a.width > b.x &&
@@ -74,18 +105,17 @@ function gameLoop(timestamp) {
     // Player movement
     if (keys["ArrowUp"] && player.y > 0) player.y -= player.speed;
     if (keys["ArrowDown"] && player.y < canvas.height - player.height) player.y += player.speed;
-    // Draw player (change to images, instead of rect drawImage)
-    ctx.fillStyle = "yellow";
-    ctx.fillRect(player.x, player.y, player.width, player.height);
+    // Draw player (image is scuffed, but fine)
+    ctx.drawImage(planeImg, player.x, player.y, player.width, player.height);
     if (timestamp - lastSpawn > spawnInterval) {
         spawnObstacle();
         lastSpawn = timestamp;
     }
     // Update obstacles (change to certain images - clouds, birds, etc)
     obstacles.forEach((obstacle) => {
+        // obstacle movement to the left
         obstacle.x -= obstacle.speed;
-        ctx.fillStyle = "red";
-        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        ctx.drawImage(obstacle.img, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
         if (rectCollision(player, obstacle)) {
             endGame();
         }
@@ -103,8 +133,31 @@ function gameLoop(timestamp) {
     // requestAnimationFrame to create an animation loop
     requestAnimationFrame(gameLoop);
 }
-
 requestAnimationFrame(gameLoop);
+
+// sending data results to back, to further 
+async function sendGameResult(result) {
+    try {
+        const response = await fetch("http://127.0.0.1:5000/api/game_result", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                player_name: sessionStorage.getItem("selected_player_name"),
+                result: result,
+                fuel_left: fuel.toFixed(1),
+                distance_left: distance.toFixed(1)
+            })
+        });
+        const data = await response.json();
+        console.log("Result saved:", data);
+    } catch (err) {
+        console.error("ERROR sending game result:", err);
+    }
+}
+
+
 // Game end conditions, for now alerts and redirect
 // also need to store score data to push it further to next final results window and to backend
 function endGame() {
@@ -115,9 +168,8 @@ function endGame() {
 function winGame() {
     running = false;
     alert("Arrived! Moving to quiz...");
-    window.location.href = "quiz.html";
+    window.location.href = "Quiz.html";
 }
-
 // Pause button
 document.getElementById("pauseButton").addEventListener("click", () => {
     running = !running;

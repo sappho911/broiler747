@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const chooseBtn = document.getElementById("choose_player_but");
         const newPlayerBtn = document.getElementById("new_player_but");
         chooseBtn.addEventListener("click", () => {
-            const selectedPlayer = localStorage.getItem("selectedPlayer");
+            const selectedPlayer = sessionStorage.getItem("selectedPlayer");
             if (selectedPlayer) {
                 window.location.href = "../views/main_menu.html";
             } else {
@@ -40,7 +40,7 @@ function makePlayerList(players) {
                 item.classList.remove("selected");
             });
             li.classList.add("selected");
-            localStorage.setItem("selectedPlayer", player.name);
+            sessionStorage.setItem("selectedPlayer", player.name);
             document.getElementById("choose_player_but").disabled = false;
         });
         playerList.appendChild(li);
