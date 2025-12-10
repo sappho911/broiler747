@@ -4,14 +4,10 @@ import time
 def get_connection():
     return mysql.connector.connect(
     host= "127.0.0.1",
-    port= 3305,
+    port= 3306,
     database= "flight_game",
     user= "root",
-<<<<<<< HEAD
     password= "tishchuk6370",
-=======
-    password= "KissaKoira",
->>>>>>> f2296535409d80f67893aa503c4b46ba070c0678
     autocommit = True
 )
 def quiz_questions(limit = 5):

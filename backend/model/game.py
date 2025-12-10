@@ -52,8 +52,6 @@ class Game:
         else:
             return "hard"
     
-
-        
     def save_game_state(self):
         try:
             conn = get_connection()

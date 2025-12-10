@@ -3,15 +3,12 @@ from config.db_connection import get_connection
 class Airport:
     def __init__(self, ident):
         self.ident = ident
-
         sql = "SELECT ident, name, latitude_deg, longitude_deg FROM Airport WHERE ident ='" +ident+"'"
-
         connection = get_connection()
         cursor = connection.cursor()
         cursor.execute(sql)
         res = cursor.fetchall()
         # print(res)
-
         if len(res) == 1:
             self.ident = res[0][0]
             self.name = res[0][1]
@@ -29,17 +26,6 @@ class Airport:
         for name, iata in res:
             airports.append({"name": name, "iata_code": iata})
         return airports
-    
-
-
-    # There is should be function witch is calculate a distance between airport using geopy we are using api for that 
-
-
-
-    # function of calculation of consumption
-
-
-    # function of fetching weather.
 
 def Select_weather(Weather):
     conn = get_connection()
@@ -49,11 +35,6 @@ def Select_weather(Weather):
     conn.commit()
     cur.close()
     return f"Weather choice '{Weather}' saved successfully."
-
-# a1 = Airport("EFHK")
-# a1.get_random_airports_from_finland(5)
-
-
 
 def get_started_country():  
     conn = get_connection()
