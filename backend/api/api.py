@@ -136,10 +136,8 @@ def register_routes(app):
     def start_game():
         data = request.json
         name = data.get("name") if data else None
-        
         if not name:
             return {"error": "Name is required"}, 400
-        
         try:
             return {"message": f"Game started for {name}"}
         except Exception as e:
@@ -220,10 +218,8 @@ def register_routes(app):
         distance_left = data.get("distance_left", 0) if data else 0
         difficulty = data.get("difficulty") if data else None
         score = data.get("score", 0) if data else 0
-        
         if not crashed:
             return {"error": "Crashed status is required"}, 400
-        
         return jsonify({
             "success": True,
             "crashed": crashed,
@@ -241,12 +237,10 @@ def register_routes(app):
         player_name = data.get("player_name") if data else None
         difficulty = data.get("difficulty") if data else None
         score = data.get("score", 0) if data else 0
-        
         if not player_name:
             return {"error": "player_name is required"}, 400
         if not difficulty:
             return {"error": "difficulty is required"}, 400
-        
         try:
             conn = get_connection()
             cursor = conn.cursor()
@@ -257,10 +251,8 @@ def register_routes(app):
                 cursor.execute('SELECT Medium_Score FROM player WHERE Player_Name = %s', (player_name,))
             elif difficulty == "hard":
                 cursor.execute('SELECT Hard_Score FROM player WHERE Player_Name = %s', (player_name,))
-            
             result = cursor.fetchone()
             current_score = result[0] if result else 0
-            
             if score > current_score:
                 if difficulty == "easy":
                     cursor.execute('UPDATE player SET Easy_Score = %s WHERE Player_Name = %s', (score, player_name))
@@ -268,17 +260,14 @@ def register_routes(app):
                     cursor.execute('UPDATE player SET Medium_Score = %s WHERE Player_Name = %s', (score, player_name))
                 elif difficulty == "hard":
                     cursor.execute('UPDATE player SET Hard_Score = %s WHERE Player_Name = %s', (score, player_name))
-                
                 conn.commit()
                 message = f"New high score! {score} points for {difficulty}"
                 updated = True
             else:
                 message = f"Score {score} not higher than current best {current_score}"
                 updated = False
-            
             cursor.close()
             conn.close()
-            
             return jsonify({
                 "success": True,
                 "player_name": player_name,
