@@ -26,13 +26,29 @@ const player = {
 let obstacles = [];
 let lastSpawn = 0;
 const spawnInterval = 900; // ms
-
-// Game state (not done, need to add fuel and distance from back, 
+// Game state (distance from back, 
 // after route is selected from choose airports window)
 let fuel = 100;
-let distance = ;
+let distance = null; 
+let running = false;
+// Fetch distance from backend 
+async function fetchDistance() {
+    try {
+        const response = await fetch("http://127.0.0.1:5000/api/distance"); 
+        const data = await response.json();
+        distance = data.distance; 
+        document.getElementById("distance").textContent = distance.toFixed(1);
+        console.log("Loaded distance:", distance);
+    } catch (error) {
+        console.error("Failed to fetch distance:", error);
+        // fallback value so gameplay still works
+        distance = 100;
+        document.getElementById("distance").textContent = distance;
+    }
+    running = true;
+}
+fetchDistance();
 // Game running state
-let running = true;
 // Weather (up to update, need weather from previous window - airport selection)
 const weatherTypes = ["Sunny", "Cloudy", "Rainy"];
 const weather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
@@ -117,8 +133,31 @@ function gameLoop(timestamp) {
     // requestAnimationFrame to create an animation loop
     requestAnimationFrame(gameLoop);
 }
-
 requestAnimationFrame(gameLoop);
+
+// sending data results to back, to further 
+async function sendGameResult(result) {
+    try {
+        const response = await fetch("http://127.0.0.1:5000/api/game_result", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                player_name: sessionStorage.getItem("selected_player_name"),
+                result: result,
+                fuel_left: fuel.toFixed(1),
+                distance_left: distance.toFixed(1)
+            })
+        });
+        const data = await response.json();
+        console.log("Result saved:", data);
+    } catch (err) {
+        console.error("ERROR sending game result:", err);
+    }
+}
+
+
 // Game end conditions, for now alerts and redirect
 // also need to store score data to push it further to next final results window and to backend
 function endGame() {

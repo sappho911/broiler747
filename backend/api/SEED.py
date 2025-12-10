@@ -10,7 +10,6 @@ def get_connection():
     password= "tishchuk6370",
     autocommit = True
 )
-
 def quiz_questions(limit = 5):
     conn = get_connection()
     cur = conn.cursor()
