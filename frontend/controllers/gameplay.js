@@ -35,10 +35,8 @@ let running = true;
 // Game running state
 // Weather (up to update, need weather from previous window - airport selection)
 const weatherTypes = ["Sunny", "Cloudy", "Rainy"];
-const currentGame_data = sessionStorage.getItem("currentGame")
-    ? JSON.parse(sessionStorage.getItem("currentGame"))
-    : {};
-const weather = currentGame_data.weather && weatherTypes.includes(currentGame_data.weather)
+const weather = sessionStorage.getItem("currentGame") ?
+    JSON.parse(sessionStorage.getItem("currentGame")).weather : "Sunny";
 document.getElementById("weather").textContent = weather;
 // Input keys
 let keys = {};
