@@ -140,8 +140,6 @@ async function sendGameResult(result) {
         console.error("ERROR sending game result:", err);
     }
 }
-
-
 // Game end conditions, for now alerts and redirect
 // also need to store score data to push it further to next final results window and to backend
 function endGame() {
