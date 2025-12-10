@@ -1,6 +1,6 @@
-// main reference used:
+// main references used:
 // https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript
-
+// https://chriscourses.com/blog/coding-collision-detection-in-javascript
 // const images before canvas is created
 const planeImg = new Image();
 planeImg.src = "../public/img/gameplay_airplane.png";
@@ -10,6 +10,7 @@ const birdImg = new Image();
 birdImg.src = "../public/img/bird.png";
 const fuelImg = new Image();
 fuelImg.src = "../public/img/fuel.png";
+// didn't end up using coin image, but keeping it for later
 const coinImg = new Image();
 coinImg.src = "../public/img/coin.png";
 // canvas, player, obstacles setup
@@ -29,7 +30,7 @@ const spawnInterval = 900; // ms
 // Game state (not done, need to add fuel and distance from back, 
 // after route is selected from choose airports window)
 let fuel = 100;
-let distance = 100;
+let distance = ;
 // Game running state
 let running = true;
 // Weather (up to update, need weather from previous window - airport selection)
@@ -61,7 +62,7 @@ function spawnObstacle() {
 // Collision detection - only one hit
 // ref - https://chriscourses.com/blog/coding-collision-detection-in-javascript
 // ref - https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript/Collision_detection
-// comparing object positons and their width and height
+// comparing object's positions and their width and height
 function rectCollision(a, b) {
     return (
         a.x < b.x + b.width && a.x + a.width > b.x &&
