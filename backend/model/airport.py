@@ -32,7 +32,7 @@ class Airport:
     
 
 
-    # There is should be function witch is calculate a distance between airport using geopy
+    # There is should be function witch is calculate a distance between airport using geopy we are using api for that 
 
 
 
@@ -64,8 +64,6 @@ def get_started_country():
         INNER JOIN country ON airport.iso_country = country.iso_country 
         WHERE country.name = 'Finland' 
         AND airport.iata_code != '' 
-        AND airport.iata_code != 'HEL' 
-        ORDER BY RAND()
     """
     cur.execute(query)
     results = cur.fetchall()
@@ -101,27 +99,3 @@ def saver():
         print(f"Error saving airport choice: {e}")
         return False
     
-
-def end_country(airport_identifier): 
-    conn = get_connection()
-    cur = conn.cursor()
-    query = """
-        SELECT airport.name, airport.iata_code, airport.latitude_deg, airport.longitude_deg
-        FROM airport 
-        WHERE (airport.iata_code = %s OR airport.name = %s)
-        AND airport.iata_code != ''
-    """
-    cur.execute(query, (airport_identifier, airport_identifier))
-    result = cur.fetchone()
-    cur.close()
-    conn.close()
-    if result:
-        return {
-            "name": result[0], 
-            "iata_code": result[1],
-            "latitude": float(result[2]),
-            "longitude": float(result[3])
-        }
-    
-    return None
-

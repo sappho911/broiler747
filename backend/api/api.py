@@ -1,10 +1,116 @@
 # api file adding code soon
 import random
-from api.SEED  import quiz_questions, get_connection
-from model.airport import Select_weather
+from api.SEED import quiz_questions
+from model.airport import Select_weather, get_started_country
 from flask import jsonify, request
+from model.game import Game
+from model.player import Player 
+from model.airport import Airport, get_connection
 
 def register_routes(app):
+    
+    @app.route("/airports", methods=["GET"])
+    def get_airports():
+        try:
+            airports = get_started_country()
+            return jsonify({"airports": airports})
+        except Exception as e:
+            return {"error": str(e)}, 500
+    
+    @app.route("/random_airports", methods=["GET"])
+    def get_random_airports():
+        try:
+            limit = request.args.get("limit", 3, type=int)
+            airport = Airport("EFHK")  
+            airports = airport.get_random_airports_from_finland(limit)
+            return jsonify({"airports": airports})
+        except Exception as e:
+            return {"error": str(e)}, 500
+    
+    # Calculate distance between two airports
+    @app.route("/distance", methods=["POST"])
+    def calculate_distance():
+        data = request.json
+        start_airport = data.get("start_airport") if data else None
+        ending_airport = data.get("ending_airport") if data else None
+        
+        if not start_airport or not ending_airport:
+            return {"error": "Both start_airport and ending_airport are required"}, 400
+        
+        try:
+            game = Game("temp", start_airport, ending_airport, "sunny", 0)
+            distance_data = game.distance(start_airport, ending_airport)
+            km = distance_data.get("km", 0)
+            difficulty = game.get_difficulty(km)
+            return jsonify({"km": km, "difficulty": difficulty})
+        except Exception as e:
+            return {"error": str(e)}, 500
+    
+    # Save game state
+    @app.route("/save_game", methods=["POST"])
+    def save_game():
+        data = request.json
+        player_name = data.get("player_name") if data else None
+        start_airport = data.get("start_airport") if data else None
+        ending_airport = data.get("ending_airport") if data else None
+        weather = data.get("weather") if data else None
+        
+        if not all([player_name, start_airport, ending_airport, weather]):
+            return {"error": "player_name, start_airport, ending_airport, and weather are required"}, 400
+        
+        try:
+            game = Game(player_name, start_airport, ending_airport, weather, 0)
+            distance_data = game.distance(start_airport, ending_airport)
+            km = distance_data.get("km", 0)
+            difficulty = game.get_difficulty(km)
+            
+            game.distancee = km
+            success = game.save_game_state()
+            if success:
+                return {"message": "Game saved successfully", "km": km, "difficulty": difficulty}
+            else:
+                return {"error": "Failed to save game"}, 500
+        except Exception as e:
+            return {"error": str(e)}, 500
+    
+    # Get player status
+    @app.route("/player_status", methods=["POST"])
+    def player_status():
+        data = request.json
+        player_name = data.get("player_name") if data else None
+        easy_score = data.get("easy_score", 0) if data else 0
+        medium_score = data.get("medium_score", 0) if data else 0
+        hard_score = data.get("hard_score", 0) if data else 0
+        
+        if not player_name:
+            return {"error": "player_name is required"}, 400
+        
+        try:
+            player = Player(player_name, easy_score, medium_score, hard_score)
+            return jsonify(player.get_status())
+        except Exception as e:
+            return {"error": str(e)}, 500
+    
+    # Update player score based on difficulty
+    @app.route("/update_score", methods=["POST"])
+    def update_player_score():
+        data = request.json
+        player_name = data.get("player_name") if data else None
+        points = data.get("points", 0) if data else 0
+        difficulty = data.get("difficulty") if data else None
+        
+        if not player_name:
+            return {"error": "player_name is required"}, 400
+        
+        try:
+            player = Player(player_name, 0, 0, 0)
+            player.update_score(points)
+            if difficulty:
+                player.game_diff(difficulty)
+            return jsonify(player.get_status())
+        except Exception as e:
+            return {"error": str(e)}, 500
+
     @app.route("/weather", methods=["POST"])
     def takerequest():
         data = request.json
@@ -28,7 +134,19 @@ def register_routes(app):
     def refuel():
         refueled = random.choice([True, False])
         return {"refueled": refueled}
-
+    @app.route("/start_game", methods=["POST"])
+    def start_game():
+        data = request.json
+        name = data.get("name") if data else None
+        
+        if not name:
+            return {"error": "Name is required"}, 400
+        
+        try:
+            return {"message": f"Game started for {name}"}
+        except Exception as e:
+            return {"error": str(e)}, 500
+          
     @app.route("/api/players", methods=["GET"])
     def playersfetcher():
         conn = get_connection()
@@ -38,7 +156,6 @@ def register_routes(app):
         results = cursor.fetchall()
         cursor.close()
         conn.close()
-        # Convert list of tuples into JSON objects
         players = [{"name": row[0]} for row in results]
         return jsonify(players)    
     
@@ -55,8 +172,14 @@ def register_routes(app):
         return jsonify(stats)
 
     @app.route('/ending_airport', methods= ["POST"])
-
-## player post name,other nulls at the start 
+    ## we gonna get here the ending airport from the user
+    def ending_airport_choice():
+        data = request.json
+        ending_airport = data.get("ending_airport") if data else None
+        if not ending_airport:
+            return {"error": "Ending airport is required"}, 400
+        return {"ending_airport": ending_airport}
+    ## player post name,other nulls at the start 
     @app.route('/new_player', methods=['POST'])
     def new_player():
         data = request.json
@@ -77,6 +200,14 @@ def register_routes(app):
         score = data.get("score") if data else None
         if not score:
             return {"error": "Score is required"}, 400
-        else:
-            return {"score": score}
+        return {"score": score}
+      
+    @app.route('/crashed', methods= ["POST"])
+    def crashed():
+        data = request.json
+        crashed = data.get("crashed") if data else None
+        if not crashed:
+            return {"error": "Crashed status is required"}, 400
+        return {"crashed": crashed}      
+        
     return app
