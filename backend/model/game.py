@@ -1,69 +1,50 @@
-import string, random
-import config
-from backend.config.db_connection import get_connection
-from airport import Airport
 
+from model.player import Player
+import requests
+import mysql.connector
+
+def get_connection():
+    return mysql.connector.connect(
+        host="127.0.0.1",
+        port=3306,
+        database="flight_game",
+        user="root",
+        password="2004",
+        autocommit=True
+    )
 
 class Game:
-    def __init__(self, id, location, consumption, player=None):
+    def __init__(self, player_name, start_airport, ending_airport, weather, distance):
+        self.player = Player(player_name, 0, 0, 0)
+        self.start_airport = start_airport
+        self.ending_airport = ending_airport
+        self.weather = weather
+        self.distancee = distance
 
-        # this is like our stateGame from previous project
-        # object where all our states of player.
-        self.status = {}
-
-        # this is where we add location where player was or visited it.
-        # better ofcourse rewrite our DB table 'Game' and add some new stuff like
-        #  score.
-        self.location = []
-
-        if id == 0:
-
-            # there is we generate our path.
-            random_path = string.ascii_lowercase + string.ascii_uppercase + string.digits
-
-            self.status = {
-                'id' : ''.join(random.choice(random_path) for i in range(15)),
-                'name' : player,
-                'co2': {
-                    'consumed': config.co2_initial,
-                    'budget': config.co2_budget,
-                }
-            }
-            self.location.append(Airport(location))
-
-            sql = "INSERT INTO Game VALUES ('" + self.status["id"] + "', " + str(self.status["co2"]["consumed"])
-            sql += ", " + str(self.status["co2"]["budget"]) + ", '" + location + "', '" + self.status["name"] + "')"
-            # print(sql)
-            connection = get_connection()
-            cursor = connection.cursor()
-            cursor.execute(sql)
-
-
-
-
-
-
-            #update game functions.
-
-
-
-
-
-
-
-
-
-#             connection.commit()
-#
-#             sql333 = "SELECT * FROM Game WHERE id = %s"
-#             cursor.execute(sql333, (self.status["id"],))
-#             res = cursor.fetchone()
-#
-#             print("status", res)
-#
-#     def __repr__(self):
-#         return f"Game(status={self.status}, location={self.location} )"
-#
-# g1 = Game(0,'EFHK',0,'Alex')
-# print(g1)
-
+        
+    def distance(self,start_airport,ending_airport): ## note i know i shouldnt have done it like this but time  is ticking and fuck u also hiii chat
+        api_key = "E2iJwihYC4fHgXMoxt6fvv1o "
+        payload = {
+            "start_airport": start_airport,
+            "ending_airport": ending_airport
+        }
+        key =  requests.get(F"https://airportgap.com/api/airports/distance",headers = { "Authorization": f"Bearer {api_key}","Content-Type":  "application/json" }, params=payload) # Raise error for bad status codes
+        
+        data = key.json()
+        return data
+    
+        
+    def save_game_state(self):
+        try:
+            conn = get_connection()
+            cursor = conn.cursor()
+            insert_sql = "INSERT INTO game (weather, player_name, start_airport, ending_airport, distancee ) VALUES (%s, %s, %s, %s, %s)"
+            cursor.execute(insert_sql, (self.weather, self.player.player_name, self.start_airport, self.ending_airport, self.distancee))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return True
+        except Exception as e:
+            print(f"Error saving game: {e}")
+            return False
+    
