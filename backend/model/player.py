@@ -22,7 +22,6 @@ class Player:
             self.hard_score = self.score / 2
         return self.score
     
-    
  
   
     

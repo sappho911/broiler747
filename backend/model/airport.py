@@ -32,7 +32,7 @@ class Airport:
     
 
 
-    # There is should be function witch is calculate a distance between airport using geopy
+    # There is should be function witch is calculate a distance between airport using geopy we are using api for that 
 
 
 

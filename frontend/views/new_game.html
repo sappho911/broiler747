@@ -3,15 +3,74 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>New Game</title>
-        <link rel="stylesheet" href="/public/css/new_game.css">
-        <script src="../controllers/new_game.js" defer></script>
-    </head>
-    <body>
-        <main>
-            <nav class="new-game-menu"> 
-                <H1>PLACEHOLDER FOR NEW GAME SETUP</H1>
-            </nav>
-        </main>
-    </body>
+     <title>New Game</title>
+     <link rel="stylesheet" href="../public/css/new_game.css">
+     <script src="../controllers/new_game.js" defer></script>
+ </head>
+ <body>
+     <main>
+         <div class="game-setup-container">
+  <h1>Flight Game Setup</h1>  <div class="airport-selection">
+      <div class="airport-table-container">
+          <h2>Start Airport</h2>
+          <div class="table-scroll">
+             <table id="start-airports-table">
+                 <thead>
+                     <tr>
+                         <th>Select</th>
+                         <th>Airport Code</th>
+                         <th>Airport Name</th>
+                     </tr>
+                 </thead>
+                 <tbody id="start-airports-body">
+                        </tbody>
+                    </table>
+                 </div>
+                     <p class="selected-label">Selected: <span id="selected-start">None</span></p>
+                 </div> 
+                 <div class="airport-table-container">
+                     <h2>End Airport</h2>
+                     <div class="table-scroll">
+            <table id="end-airports-table">
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Airport Code</th>
+                        <th>Airport Name</th>
+                    </tr>
+                </thead>
+                <tbody id="end-airports-body">
+                
+                             </tbody>
+                         </table>
+                     </div>
+                     <p class="selected-label">Selected: <span id="selected-end">None</span></p>
+                 </div>
+             </div>
+     
+             <div class="distance-display">
+                 <p>Distance: <span id="distance-value">--</span> km</p>
+                 <p>Difficulty: <span id="difficulty-badge" class="difficulty-badge">--</span></p>
+             </div>
+             <div class="weather-selection">
+                 <h2>Select Weather</h2>
+        <div class="weather-buttons">
+            <button class="weather-btn" data-weather="sunny">
+                ☀️ Sunny
+            </button>
+       <button class="weather-btn" data-weather="cloudy">
+           ☁️ Cloudy
+       </button>
+       <button class="weather-btn" data-weather="rainy">
+           🌧️ Rainy
+                </button>
+            </div>
+            <p class="selected-label">Selected Weather: <span id="selected-weather">None</span></p>
+        </div>
+        
+        <!-- Start Game Button -->
+             <button id="start-game-btn" class="start-game-btn" disabled>Start Game</button>
+         </div>
+     </main>
+  </body>
 </html>
