@@ -131,6 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
             optionsBox.appendChild(div);
         });
         scoresender();
+        window.location.href = "../views/final_window.html"
     };    
     const scoresender = async () => {
     try {
