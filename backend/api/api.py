@@ -200,6 +200,7 @@ def register_routes(app):
         score = data.get("score") if data else None
         if not score:
             return {"error": "Score is required"}, 400
+<<<<<<< HEAD
         return {"score": score}
       
     @app.route('/crashed', methods= ["POST"])
@@ -210,4 +211,8 @@ def register_routes(app):
             return {"error": "Crashed status is required"}, 400
         return {"crashed": crashed}      
         
+=======
+        else:
+            return {"score": score}
+>>>>>>> f2296535409d80f67893aa503c4b46ba070c0678
     return app
