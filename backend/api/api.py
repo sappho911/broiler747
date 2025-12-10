@@ -1,6 +1,6 @@
 # api file adding code soon
 import random
-from api.SEED  import quiz_questions
+from api.SEED import quiz_questions
 from model.airport import Select_weather, get_started_country
 from flask import jsonify, request
 from model.game import Game
@@ -9,7 +9,6 @@ from model.airport import Airport, get_connection
 
 def register_routes(app):
     
-    # Get all airports in Finland
     @app.route("/airports", methods=["GET"])
     def get_airports():
         try:
@@ -18,12 +17,11 @@ def register_routes(app):
         except Exception as e:
             return {"error": str(e)}, 500
     
-    # Get random airports from Finland (excluding HEL)
     @app.route("/random_airports", methods=["GET"])
     def get_random_airports():
         try:
             limit = request.args.get("limit", 3, type=int)
-            airport = Airport("EFHK")  # Using Helsinki as base
+            airport = Airport("EFHK")  
             airports = airport.get_random_airports_from_finland(limit)
             return jsonify({"airports": airports})
         except Exception as e:
@@ -42,7 +40,9 @@ def register_routes(app):
         try:
             game = Game("temp", start_airport, ending_airport, "sunny", 0)
             distance_data = game.distance(start_airport, ending_airport)
-            return jsonify(distance_data)
+            km = distance_data.get("km", 0)
+            difficulty = game.get_difficulty(km)
+            return jsonify({"km": km, "difficulty": difficulty})
         except Exception as e:
             return {"error": str(e)}, 500
     
@@ -54,16 +54,20 @@ def register_routes(app):
         start_airport = data.get("start_airport") if data else None
         ending_airport = data.get("ending_airport") if data else None
         weather = data.get("weather") if data else None
-        distance = data.get("distance", 0) if data else 0
         
         if not all([player_name, start_airport, ending_airport, weather]):
             return {"error": "player_name, start_airport, ending_airport, and weather are required"}, 400
         
         try:
-            game = Game(player_name, start_airport, ending_airport, weather, distance)
+            game = Game(player_name, start_airport, ending_airport, weather, 0)
+            distance_data = game.distance(start_airport, ending_airport)
+            km = distance_data.get("km", 0)
+            difficulty = game.get_difficulty(km)
+            
+            game.distancee = km
             success = game.save_game_state()
             if success:
-                return {"message": "Game saved successfully"}
+                return {"message": "Game saved successfully", "km": km, "difficulty": difficulty}
             else:
                 return {"error": "Failed to save game"}, 500
         except Exception as e:
@@ -172,6 +176,8 @@ def register_routes(app):
         if not crashed:
             return {"error": "Crashed status is required"}, 400
         return {"crashed": crashed} 
+    
+
         
         
     return app

@@ -20,3 +20,4 @@ export const getData = async function (url, uploadData = undefined) {
     throw error;
   }
 };
+

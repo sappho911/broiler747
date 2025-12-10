@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Choose Player</title>
+        <link rel="stylesheet" href="../public/css/choose_player.css">
+        <script type="module" src="../controllers/choose_player.js" defer></script>
+        <script type="module" src="../model/players.js" defer></script>
+    </head>
+    <body>
+        <main>
+            <div class="pixel-frame">
+            <nav class="choose-player-menu">
+                <ul id="player_list"> 
+                </ul>
+                <button id="choose_player_but" disabled>CHOOSE EXISTING PLAYER</button>
+                <button id="new_player_but" onclick="window.location.href='../views/new_player.html;'">CREATE NEW PLAYER</button>
+            </nav>
+            </div>
+        </main>
+    </body>
+</html>
