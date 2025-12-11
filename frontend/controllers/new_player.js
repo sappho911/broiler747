@@ -1,4 +1,3 @@
-// just wait for DOM
 document.addEventListener("DOMContentLoaded", function () {
     const btnCreate = document.getElementById("create_player_btn");
     const inputName = document.getElementById("player_name_input");
