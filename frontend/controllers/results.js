@@ -26,7 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const fuelEl = document.getElementById("fuel-left");
     const diffEl = document.getElementById("difficulty");
 
-    // fill in name
     nameEl.textContent = playerName;
 
     // crashed / won text
@@ -80,7 +79,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (diff === "medium") diffEl.classList.add("medium");
     if (diff === "hard") diffEl.classList.add("hard");
 
-    // buttons
     document.getElementById("quiz-btn").addEventListener("click", () => {
         window.location.href = "quiz.html";
     });
