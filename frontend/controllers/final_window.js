@@ -1,5 +1,3 @@
-// Final screen controller – shows summary + final score
-
 document.addEventListener("DOMContentLoaded", () => {
     // pulling everything from storage (local + session, whichever exists)
     const quizScore = JSON.parse(sessionStorage.getItem("quizScore")) || { score: 0, total: 5 };
@@ -9,7 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const storedLocal = JSON.parse(localStorage.getItem("currentGame")) || {};
     const storedSession = JSON.parse(sessionStorage.getItem("currentGame")) || {};
     const currentGame = { ...storedLocal, ...storedSession };
-
     const playerName = localStorage.getItem("playerName") 
         || sessionStorage.getItem("playerName") 
         || "Unknown Player";
@@ -41,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const travelScore = Math.round(baseScore * diffMult * 10) / 10;
     const maxTravel = Math.round(5 * diffMult * 10) / 10;
+
     const quizPoints = quizScore.score || 0;
     const totalScore = Math.round((quizPoints + travelScore) * 10) / 10;
     const maxTotal = 5 + maxTravel;
@@ -49,17 +47,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const titleEl = document.getElementById("final_score_title");
     const nameEl = document.getElementById("player-name");
     const statusEl = document.getElementById("game-status");
+
     if (nameEl) nameEl.textContent = playerName;
 
     // crashed / win text
     if (gameResult.crashed) {
         titleEl && (titleEl.textContent = "CRASHED!");
         titleEl && titleEl.classList.add("crashed");
+
         statusEl && (statusEl.textContent = "Crashed");
         statusEl && statusEl.classList.add("status-crashed");
+
     } else if (gameResult.won) {
         titleEl && (titleEl.textContent = "YOU WIN!");
         titleEl && titleEl.classList.add("won");
+
         statusEl && (statusEl.textContent = "Arrived Safely!");
         statusEl && statusEl.classList.add("status-won");
     } else {
@@ -74,7 +76,6 @@ document.addEventListener("DOMContentLoaded", () => {
     endEl && (endEl.textContent = currentGame.endAirport || currentGame.end_airport || "--");
     weatherEl && (weatherEl.textContent = currentGame.weather || gameResult.weather || "--");
 
-    // distances / fuel
     const totalDistEl = document.getElementById("total-distance");
     const distDoneEl = document.getElementById("distance-traveled");
     const distLeftEl = document.getElementById("distance-left");
@@ -111,14 +112,12 @@ document.addEventListener("DOMContentLoaded", () => {
     totalEl && (totalEl.textContent = `${totalScore} / ${maxTotal}`);
     // send summary to backend
     sendFinalScore(playerName, difficulty, totalScore);
-
     // UI buttons
     document.getElementById("play-again-btn")?.addEventListener("click", () => {
         sessionStorage.removeItem("gameResult");
         sessionStorage.removeItem("quizScore");
         window.location.href = "new_game.html";
     });
-
     document.getElementById("back_to_menu_btn")?.addEventListener("click", () => {
         sessionStorage.removeItem("gameResult");
         sessionStorage.removeItem("quizScore");
@@ -129,7 +128,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // send final combined score to backend
 async function sendFinalScore(playerName, difficulty, totalScore) {
-
     if (!playerName || !difficulty) {
         console.log("Missing player info, not sending final score.");
         return;
@@ -146,7 +144,6 @@ async function sendFinalScore(playerName, difficulty, totalScore) {
         });
         const data = await res.json();
         console.log("Final score updated:", data);
-
     } catch (err) {
         console.log("Failed sending final score:", err);
     }
