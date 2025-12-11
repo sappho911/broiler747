@@ -1,225 +1,229 @@
-
 const API_BASE = "http://127.0.0.1:5000";
 
-// State
 let selectedStartAirport = null;
-let selectedEndAirport = null;
-let selectedWeather = null;
-let airportsData = []; 
-const startAirportsBody = document.getElementById("start-airports-body");
-const endAirportsBody = document.getElementById("end-airports-body");
-const selectedStartSpan = document.getElementById("selected-start");
-const selectedEndSpan = document.getElementById("selected-end");
-const distanceValue = document.getElementById("distance-value");
-const difficultyBadge = document.getElementById("difficulty-badge");
+let selectedEndAirport   = null;
+let selectedWeather      = null;
+let airportsData = [];
+
+const startAirportsBody   = document.getElementById("start-airports-body");
+const endAirportsBody     = document.getElementById("end-airports-body");
+const selectedStartSpan   = document.getElementById("selected-start");
+const selectedEndSpan     = document.getElementById("selected-end");
+const distanceValue       = document.getElementById("distance-value");
+const difficultyBadge     = document.getElementById("difficulty-badge");
 const selectedWeatherSpan = document.getElementById("selected-weather");
-const startGameBtn = document.getElementById("start-game-btn");
+const startGameBtn        = document.getElementById("start-game-btn");
+
 const weatherButtons = document.querySelectorAll(".weather-btn");
 
+
+// Load airports (plain fetch)
 async function fetchAirports() {
+    let json;
     try {
-        const response = await fetch(`${API_BASE}/airports`);
-        const data = await response.json();
-        airportsData = data.airports || [];
-        return airportsData;
-    } catch (error) {
-        console.error("Error fetching airports:", error);
-        return [];
+        const res = await fetch(API_BASE + "/airports");
+        json = await res.json();
+        airportsData = json.airports || [];
+    } catch (e) {
+        console.warn("couldn't fetch airports:", e);
+        airportsData = [];
     }
-}
-// Haversine formula to calculate distance between two lat/lon points
-function calculateDistanceLocal(lat1, lon1, lat2, lon2) {
-    const R = 6371; const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
+    return airportsData;
 }
 
-function getDifficulty(distanceKm) {
-    if (distanceKm < 250) return "easy";
-    if (distanceKm <= 500) return "medium";
+
+// rough distance calc (Haversine)
+// TODO: maybe move to helper?
+function calculateDistanceLocal(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const p = Math.PI/180;
+    const dLat = (lat2 - lat1) * p;
+    const dLon = (lon2 - lon1) * p;
+
+    const a =
+        Math.sin(dLat/2) ** 2 +
+        Math.cos(lat1 * p) *
+        Math.cos(lat2 * p) *
+        Math.sin(dLon/2) ** 2;
+
+    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+}
+
+
+function getDifficulty(km) {
+    if (km < 250) return "easy";
+    if (km <= 500) return "medium";
     return "hard";
 }
-function populateAirportTable(airports, tbody, type) {
-    tbody.innerHTML = "";
-    
-    airports.forEach((airport) => {
-        const row = document.createElement("tr");
-        const airportCode = airport.iata_code || airport.ident || "N/A";
-        row.innerHTML = `
-            <td><input type="radio" name="${type}-airport" value="${airportCode}"></td>
-            <td>${airportCode}</td>
-            <td>${airport.name || "Unknown"}</td>
+
+
+// Put airports into table
+function populateAirportTable(list, tbody, type) {
+    tbody.innerHTML = "";  // reset
+
+    // for debugging:
+
+    for (let ap of list) {
+        const code = ap.iata_code || ap.ident || "N/A";
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td><input type="radio" name="${type}-airport"></td>
+            <td>${code}</td>
+            <td>${ap.name || ""}</td>
         `;
-        
-        row.dataset.lat = airport.latitude || 0;
-        row.dataset.lon = airport.longitude || 0;
-        row.dataset.code = airportCode;
-        
-        row.addEventListener("click", () => {
-            const radio = row.querySelector('input[type="radio"]');
-            radio.checked = true;
-            tbody.querySelectorAll("tr").forEach(r => r.classList.remove("selected"));
-            row.classList.add("selected");
-            
+
+        // store coords on element (lazy but works)
+        tr.dataset.lat  = ap.latitude  || 0;
+        tr.dataset.lon  = ap.longitude || 0;
+        tr.dataset.code = code;
+
+        tr.onclick = () => {
+            // highlight selection
+            [...tbody.querySelectorAll("tr")].forEach(row => row.classList.remove("selected"));
+            tr.classList.add("selected");
+
+            const picked = {
+                code: tr.dataset.code,
+                lat : parseFloat(tr.dataset.lat),
+                lon : parseFloat(tr.dataset.lon)
+            };
+
             if (type === "start") {
-                selectedStartAirport = {
-                    code: airportCode,
-                    lat: parseFloat(row.dataset.lat),
-                    lon: parseFloat(row.dataset.lon)
-                };
-                selectedStartSpan.textContent = airportCode;
+                selectedStartAirport = picked;
+                selectedStartSpan.textContent = picked.code;
             } else {
-                selectedEndAirport = {
-                    code: airportCode,
-                    lat: parseFloat(row.dataset.lat),
-                    lon: parseFloat(row.dataset.lon)
-                };
-                selectedEndSpan.textContent = airportCode;
+                selectedEndAirport = picked;
+                selectedEndSpan.textContent = picked.code;
             }
-            
+
             if (selectedStartAirport && selectedEndAirport) {
-                calculateDistance();
+                refreshDistanceUI();
             }
-            
-            checkCanStartGame();
-        });
-        
-        tbody.appendChild(row);
-    });
-}
-function calculateDistance() {
-    if (!selectedStartAirport || !selectedEndAirport) return;
-    
-    const km = calculateDistanceLocal(
-        selectedStartAirport.lat,
-        selectedStartAirport.lon,
-        selectedEndAirport.lat,
-        selectedEndAirport.lon
-    );
-    
-    const difficulty = getDifficulty(km);
-    
-    distanceValue.textContent = km.toFixed(2);
-    updateDifficultyBadge(difficulty);
-}
-function updateDifficultyBadge(difficulty) {
-    difficultyBadge.textContent = difficulty || "--";
-    difficultyBadge.className = "difficulty-badge";
-    
-    if (difficulty === "easy") {
-        difficultyBadge.classList.add("easy");
-    } else if (difficulty === "medium") {
-        difficultyBadge.classList.add("medium");
-    } else if (difficulty === "hard") {
-        difficultyBadge.classList.add("hard");
+
+            updateStartButtonState();
+        };
+
+        tbody.appendChild(tr);
     }
 }
+
+
+// small helper to recompute & display distance + difficulty
+function refreshDistanceUI() {
+    if (!selectedStartAirport || !selectedEndAirport) return;
+
+    const km = calculateDistanceLocal(
+        selectedStartAirport.lat, selectedStartAirport.lon,
+        selectedEndAirport.lat,   selectedEndAirport.lon
+    );
+
+    distanceValue.textContent = km.toFixed(2);
+    updateDifficultyBadge(getDifficulty(km));
+}
+
+
+// color box for difficulty
+function updateDifficultyBadge(d) {
+    difficultyBadge.textContent = d || "--";
+    difficultyBadge.className = "difficulty-badge " + d;
+}
+
+
+// weather choice
 weatherButtons.forEach(btn => {
     btn.addEventListener("click", () => {
         weatherButtons.forEach(b => b.classList.remove("selected"));
         btn.classList.add("selected");
-        
+
         selectedWeather = btn.dataset.weather;
-        selectedWeatherSpan.textContent = selectedWeather.charAt(0).toUpperCase() + selectedWeather.slice(1);
-        
-        checkCanStartGame();
+        selectedWeatherSpan.textContent =
+            selectedWeather[0].toUpperCase() + selectedWeather.slice(1);
+
+        updateStartButtonState();
     });
 });
-function checkCanStartGame() {
-    if (selectedStartAirport && selectedEndAirport && selectedWeather) {
-        startGameBtn.disabled = false;
-    } else {
-        startGameBtn.disabled = true;
-    }
+
+// Enable button only when everything is selected
+function updateStartButtonState() {
+    startGameBtn.disabled =
+        !(selectedStartAirport && selectedEndAirport && selectedWeather);
 }
+
+// used to also store difficulty
 function getCurrentDistanceAndDifficulty() {
-    if (!selectedStartAirport || !selectedEndAirport) return { km: 0, difficulty: "easy" };
+    if (!selectedStartAirport || !selectedEndAirport) {
+        return { km: 0, difficulty: "easy" };
+    }
     const km = calculateDistanceLocal(
         selectedStartAirport.lat,
         selectedStartAirport.lon,
         selectedEndAirport.lat,
         selectedEndAirport.lon
     );
-    return { km: km, difficulty: getDifficulty(km) };
-}
-startGameBtn.addEventListener("click", async () => {
-    if (!selectedStartAirport || !selectedEndAirport || !selectedWeather) {
-        alert("Please select start airport, end airport, and weather!");
-        return;
-    }
-    
-    let playerName = sessionStorage.getItem("selectedPlayer") || localStorage.getItem("playerName");
-    if (!playerName) {
-        playerName = prompt("Enter your player name:");
-        if (playerName) {
-            localStorage.setItem("playerName", playerName);
-            sessionStorage.setItem("playerName", playerName);
-        } else {
-            alert("Player name is required!");
-            return;
-        }
-    } else {
-        // Make sure it's in localStorage for gameplay.js
-        // That was a debatable decision
-        localStorage.setItem("playerName", playerName);
-    }
-    
-    const { km, difficulty } = getCurrentDistanceAndDifficulty();
-    try {
-        const response = await fetch(`${API_BASE}/save_game`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                player_name: playerName,
-                start_airport: selectedStartAirport.code,
-                ending_airport: selectedEndAirport.code,
-                weather: selectedWeather
-            })
-        });
-        
-        const data = await response.json();
-        
-        const gameData = {
-            startAirport: selectedStartAirport.code,
-            endAirport: selectedEndAirport.code,
-            weather: selectedWeather,
-            distance: km,
-            difficulty: difficulty
-        };
-        sessionStorage.setItem("currentGame", JSON.stringify(gameData));
-        localStorage.setItem("currentGame", JSON.stringify(gameData));
-        
-        window.location.href = "gameplay.html";
-    } catch (error) {
-        console.error("Error starting game:", error);
-        const gameData = {
-            startAirport: selectedStartAirport.code,
-            endAirport: selectedEndAirport.code,
-            weather: selectedWeather,
-            distance: km,
-            difficulty: difficulty
-        };
-        sessionStorage.setItem("currentGame", JSON.stringify(gameData));
-        localStorage.setItem("currentGame", JSON.stringify(gameData));
-        window.location.href = "gameplay.html";
-    }
-});
-async function init() {
-    const airports = await fetchAirports();
-    
-    if (airports.length > 0) {
-        populateAirportTable(airports, startAirportsBody, "start");
-        populateAirportTable(airports, endAirportsBody, "end");
-    } else {
-        startAirportsBody.innerHTML = '<tr><td colspan="3">No airports found</td></tr>';
-        endAirportsBody.innerHTML = '<tr><td colspan="3">No airports found</td></tr>';
-    }
+    return { km, difficulty: getDifficulty(km) };
 }
 
+
+// Button start game
+startGameBtn.onclick = async () => {
+    if (!selectedStartAirport || !selectedEndAirport || !selectedWeather) {
+        alert("Select everything first.");
+        return;
+    }
+    let playerName =
+        sessionStorage.getItem("selectedPlayer") ||
+        localStorage.getItem("playerName");
+    if (!playerName) {
+        playerName = prompt("Enter player name:");
+        if (!playerName) return;
+        localStorage.setItem("playerName", playerName);
+        sessionStorage.setItem("playerName", playerName);
+    } else {
+        // keep storage consistent (just in case)
+        localStorage.setItem("playerName", playerName);
+    }
+
+    const { km, difficulty } = getCurrentDistanceAndDifficulty();
+    // send basic game info to backend (if fails, just continue)
+    try {
+        await fetch(API_BASE + "/save_game", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                player_name   : playerName,
+                start_airport : selectedStartAirport.code,
+                ending_airport: selectedEndAirport.code,
+                weather       : selectedWeather
+            })
+        });
+    } catch (err) {
+        console.log("save_game failed (not fatal):", err);
+    }
+    const gameData = {
+        startAirport : selectedStartAirport.code,
+        endAirport   : selectedEndAirport.code,
+        weather      : selectedWeather,
+        distance     : km,
+        difficulty
+    };
+
+    // store for gameplay.js
+    sessionStorage.setItem("currentGame", JSON.stringify(gameData));
+    localStorage.setItem("currentGame", JSON.stringify(gameData));
+    window.location.href = "gameplay.html";
+};
+
+// Page init
+async function init() {
+    const ap = await fetchAirports();
+    if (ap.length) {
+        populateAirportTable(ap, startAirportsBody, "start");
+        populateAirportTable(ap, endAirportsBody, "end");
+    } else {
+        startAirportsBody.innerHTML = "<tr><td colspan='3'>No airports found</td></tr>";
+        endAirportsBody.innerHTML   = "<tr><td colspan='3'>No airports found</td></tr>";
+    }
+}
+// a bit redundant but harmless
 document.addEventListener("DOMContentLoaded", init);
