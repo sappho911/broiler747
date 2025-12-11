@@ -1,5 +1,6 @@
 const API_BASE = "http://127.0.0.1:5000";
 
+// Globals 
 let selectedStartAirport = null;
 let selectedEndAirport   = null;
 let selectedWeather      = null;
@@ -50,6 +51,7 @@ function calculateDistanceLocal(lat1, lon1, lat2, lon2) {
 }
 
 
+// difficulty buckets — simple, nothing fancy
 function getDifficulty(km) {
     if (km < 250) return "easy";
     if (km <= 500) return "medium";
@@ -60,8 +62,6 @@ function getDifficulty(km) {
 // Put airports into table
 function populateAirportTable(list, tbody, type) {
     tbody.innerHTML = "";  // reset
-
-    // for debugging:
 
     for (let ap of list) {
         const code = ap.iata_code || ap.ident || "N/A";
@@ -108,16 +108,13 @@ function populateAirportTable(list, tbody, type) {
     }
 }
 
-
 // small helper to recompute & display distance + difficulty
 function refreshDistanceUI() {
     if (!selectedStartAirport || !selectedEndAirport) return;
-
     const km = calculateDistanceLocal(
         selectedStartAirport.lat, selectedStartAirport.lon,
         selectedEndAirport.lat,   selectedEndAirport.lon
     );
-
     distanceValue.textContent = km.toFixed(2);
     updateDifficultyBadge(getDifficulty(km));
 }
@@ -135,7 +132,6 @@ weatherButtons.forEach(btn => {
     btn.addEventListener("click", () => {
         weatherButtons.forEach(b => b.classList.remove("selected"));
         btn.classList.add("selected");
-
         selectedWeather = btn.dataset.weather;
         selectedWeatherSpan.textContent =
             selectedWeather[0].toUpperCase() + selectedWeather.slice(1);
@@ -144,11 +140,13 @@ weatherButtons.forEach(btn => {
     });
 });
 
+
 // Enable button only when everything is selected
 function updateStartButtonState() {
     startGameBtn.disabled =
         !(selectedStartAirport && selectedEndAirport && selectedWeather);
 }
+
 
 // used to also store difficulty
 function getCurrentDistanceAndDifficulty() {
@@ -171,9 +169,11 @@ startGameBtn.onclick = async () => {
         alert("Select everything first.");
         return;
     }
+
     let playerName =
         sessionStorage.getItem("selectedPlayer") ||
         localStorage.getItem("playerName");
+
     if (!playerName) {
         playerName = prompt("Enter player name:");
         if (!playerName) return;
@@ -185,6 +185,7 @@ startGameBtn.onclick = async () => {
     }
 
     const { km, difficulty } = getCurrentDistanceAndDifficulty();
+
     // send basic game info to backend (if fails, just continue)
     try {
         await fetch(API_BASE + "/save_game", {
@@ -200,6 +201,7 @@ startGameBtn.onclick = async () => {
     } catch (err) {
         console.log("save_game failed (not fatal):", err);
     }
+
     const gameData = {
         startAirport : selectedStartAirport.code,
         endAirport   : selectedEndAirport.code,
@@ -211,12 +213,15 @@ startGameBtn.onclick = async () => {
     // store for gameplay.js
     sessionStorage.setItem("currentGame", JSON.stringify(gameData));
     localStorage.setItem("currentGame", JSON.stringify(gameData));
+
     window.location.href = "gameplay.html";
 };
+
 
 // Page init
 async function init() {
     const ap = await fetchAirports();
+
     if (ap.length) {
         populateAirportTable(ap, startAirportsBody, "start");
         populateAirportTable(ap, endAirportsBody, "end");
@@ -225,5 +230,5 @@ async function init() {
         endAirportsBody.innerHTML   = "<tr><td colspan='3'>No airports found</td></tr>";
     }
 }
-// a bit redundant but harmless
+
 document.addEventListener("DOMContentLoaded", init);

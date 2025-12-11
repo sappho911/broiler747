@@ -1,35 +1,47 @@
+// just wait for DOM
+document.addEventListener("DOMContentLoaded", function () {
+    const btnCreate = document.getElementById("create_player_btn");
+    const inputName = document.getElementById("player_name_input");
+    const msg = document.getElementById("status_message");
 
-document.addEventListener("DOMContentLoaded", () => {
-    const createBtn = document.getElementById("create_player_btn");
-    const nameInput = document.getElementById("player_name_input");
-    const statusMessage = document.getElementById("status_message");
+    // create player handler
+    btnCreate.addEventListener("click", async () => {
+        const raw = inputName.value.trim();
 
-    createBtn.addEventListener("click", async () => {
-        const name = nameInput.value.trim();
-        if (name.length === 0) {
-            statusMessage.textContent = "Name cannot be empty!";
+        // quick sanity check
+        if (!raw) {
+            msg.textContent = "Name cannot be empty.";
             return;
         }
+
+        let res, payload;
         try {
-            const response = await fetch("http://127.0.0.1:5000/new_player", {
+            res = await fetch("http://127.0.0.1:5000/new_player", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ name })
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: raw })
             });
-            const result = await response.json();
-            if (response.ok) {
-                statusMessage.textContent = "Player created!";
-                setTimeout(() => {
-                    window.location.href = "choose_player.html";
-                }, 1000);
-            } else {
-                statusMessage.textContent = result.error || "Error creating player.";
+
+            // could fail if backend crashes, wrap json in try
+            try {
+                payload = await res.json();
+            } catch (jErr) {
+                console.warn("json parse?", jErr);
+                payload = {};
             }
-        } catch (err) {
-            console.error(err);
-            statusMessage.textContent = "Server error.";
+
+            if (res.ok) {
+                msg.textContent = "Player created!";
+                // small delay just to show message
+                setTimeout(() => {
+                    location.href = "choose_player.html";
+                }, 900);
+            } else {
+                msg.textContent = payload?.error || "Couldn't create player.";
+            }
+        } catch (netErr) {
+            console.log("network?", netErr);
+            msg.textContent = "Server seems down.";
         }
     });
 });
