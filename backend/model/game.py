@@ -1,17 +1,7 @@
 
 from model.player import Player
 import requests
-import mysql.connector
-
-def get_connection():
-    return mysql.connector.connect(
-        host="127.0.0.1",
-        port=3306,
-        database="flight_game",
-        user="root",
-        password="2004",
-        autocommit=True
-    )
+from config.db_connection import get_connection
 
 class Game:
     def __init__(self, player_name, start_airport, ending_airport, weather, distance, difficulty=None):

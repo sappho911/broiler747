@@ -247,7 +247,7 @@ def register_routes(app):
             "message": "You crashed! Better luck next time."
         })
     
-    @app.route('/update_final_score', methods=["POST"]) @app.route("/update_final_score", methods=["POST"])
+    @app.route('/update_final_score', methods=["POST"]) 
     def final_score_update():
         body = request.json or {}
         name = body.get("player_name")

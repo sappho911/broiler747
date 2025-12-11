@@ -1,19 +1,19 @@
 document.addEventListener("DOMContentLoaded", () => {
-    //Variables\\
+    //Variables
     let questions = [];
     let currentQuestion = 0;
     let time = 10;
     let timerId;
     let score = 0;
     const pickedAnswers = [];
-    //Dom\\
+    //Dom
     const quizBox = document.getElementById("quizmodel");
     const qText = document.getElementById("quizquestion");
     const optionsBox = document.getElementById("optionscontainer");
     const feedback = document.getElementById("quizfeedback");
     const nextBtn = document.getElementById("button");
     const timeText = document.getElementById("timeleft");
-    //Fetch quiz data\\
+    //Fetch quiz data
     const loadQuiz = async () => {
         try {
             const res = await fetch("http://localhost:5000/seed_quiz");
@@ -136,7 +136,6 @@ document.addEventListener("DOMContentLoaded", () => {
             score: score,
             total: questions.length
         }));
-        
         // Don't send score here - final_window.js will send the combined score
         window.location.href = "../views/final_window.html"
     };    
