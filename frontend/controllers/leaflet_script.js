@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.warn("Missing route data. Using defaults.");
     }
 
-    // We need airport coordinates → load airports again (lightweight)
+    // got airports
     let airports = [];
     try {
         const res = await fetch("http://127.0.0.1:5000/airports");
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const startA = findAirport(startCode);
     const endA = findAirport(endCode);
 
-    // default fallback if coordinates missing
+    // default stats for showcase or got them by fetch
     const startLat = startA?.latitude || 51.505;
     const startLon = startA?.longitude || -0.09;
     const endLat   = endA?.latitude || 61.2;
@@ -56,10 +56,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const endPos = L.latLng(endLat, endLon);
 
     const plane = L.marker(startPos, { icon: planeIcon }).addTo(map);
-
-    // simple human-style animation
     function flyPlane() {
-        const duration = 15000; // 15s
+        const duration = 15000;
         const t0 = performance.now();
 
         function frame(t) {
