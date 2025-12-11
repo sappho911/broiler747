@@ -1,16 +1,35 @@
 import { getPlayers } from "../model/players.js";
 
+
 document.addEventListener("DOMContentLoaded", async () => {
-    // try to load players from backend
-    let players = [];
+
+    let list;   
+
     try {
-        players = await getPlayers();
-        renderPlayerList(players);
-    } catch (err) {
-        console.error("Error loading players:", err);
-        const list = document.getElementById("player_list");
-        list.innerHTML = "<li>Could not load players</li>";
-        return;
+        const allPlayers = await getPlayers();
+        
+        buildList(allPlayers);
+
+        const chooseBtn = document.getElementById("choose_player_but");
+        const newBtn = document.getElementById("new_player_but");
+
+        chooseBtn.addEventListener("click", () => {
+            const p = sessionStorage.getItem("selectedPlayer");
+            if (p) {
+                window.location.href = "../views/main_menu.html";
+            } else {
+                alert("Please select a player.");
+            }
+        });
+
+        newBtn.addEventListener("click", () => {
+            window.location.href = "../views/new_player.html";
+        });
+
+    } catch (e) {
+        console.log("Could not load players:", e);
+        const listElement = document.getElementById("player_list");
+        listElement.innerHTML = "<li>Could not load players. Check console.</li>";
     }
     const chooseBtn = document.getElementById("choose_player_but");
     const newPlayerBtn = document.getElementById("new_player_but");
@@ -32,23 +51,31 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 
-function renderPlayerList(players) {
-    const list = document.getElementById("player_list");
-    list.innerHTML = "";
-    players.forEach(p => {
-        const row = document.createElement("li");
-        row.textContent = p.name;
-        row.addEventListener("click", () => {
-            // clear previous highlight
-            list.querySelectorAll("li").forEach(li => li.classList.remove("selected"));
+function buildList(players) {
+    const container = document.getElementById("player_list");
+    if (!container) return;  
 
-            row.classList.add("selected");
-            sessionStorage.setItem("selectedPlayer", p.name);
+    container.innerHTML = "";
 
-            const chooseBtn = document.getElementById("choose_player_but");
-            chooseBtn.disabled = false;
-        });
+    players.forEach((plr) => {
 
-        list.appendChild(row);
+        const item = document.createElement("li");
+        item.textContent = plr.name;
+
+        item.onclick = () => {
+
+            const all = document.querySelectorAll("#player_list li");
+            for (let i = 0; i < all.length; i++) {
+                all[i].classList.remove("selected");
+            }
+
+            item.classList.add("selected");
+            sessionStorage.setItem("selectedPlayer", plr.name);
+
+            const pickBtn = document.getElementById("choose_player_but");
+            if (pickBtn) pickBtn.disabled = false;
+        };
+
+        container.appendChild(item);
     });
 }

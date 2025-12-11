@@ -23,7 +23,6 @@ body {
   align-items: center;
 }
 
-/*Centered content*/
 main {
   width: 100%;
   max-width: 420px;
@@ -72,7 +71,6 @@ main {
   background: rgba(85, 170, 255, 0.2);
 }
 
-/* Buttons */
 .choose-player-menu button {
   font-family: 'VT323', monospace;
   font-size: 20px;
@@ -102,7 +100,6 @@ main {
   border-color: #990055;
 }
 
-/*Scrollbar*/
 #player_list::-webkit-scrollbar {
   width: 8px;
 }
