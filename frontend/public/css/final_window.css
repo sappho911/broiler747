@@ -70,7 +70,6 @@ main {
   text-shadow: 2px 2px 0 #00aa00;
 }
 
-/* Result Box */
 .result-box {
   background: #0a0a1a;
   border: 4px solid #336699;
@@ -127,7 +126,6 @@ main {
   color: #ff4444;
 }
 
-/* Score Box */
 .score-box {
   background: #0a0a1a;
   border: 4px solid #ffcc00;

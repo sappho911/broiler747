@@ -1,65 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Game Results</title>
-    <link rel="stylesheet" href="../public/css/results.css">
+
+    <link rel="stylesheet" href="../public/css/results.css" />
 </head>
+
 <body>
     <main>
         <div class="pixel-frame">
+
             <h1 id="result-title">GAME OVER</h1>
-            
-            <div class="result-box">
+
+            <section class="result-box">
                 <h2>Flight Summary</h2>
-                
+
                 <div class="stat-row">
                     <span class="stat-label">Player:</span>
                     <span class="stat-value" id="player-name">--</span>
                 </div>
-                
+
                 <div class="stat-row">
                     <span class="stat-label">Status:</span>
                     <span class="stat-value" id="game-status">--</span>
                 </div>
-                
+
                 <div class="stat-row">
                     <span class="stat-label">Start Airport:</span>
                     <span class="stat-value" id="start-airport">--</span>
                 </div>
-                
+
                 <div class="stat-row">
                     <span class="stat-label">End Airport:</span>
                     <span class="stat-value" id="end-airport">--</span>
                 </div>
-                
+
                 <div class="stat-row">
                     <span class="stat-label">Weather:</span>
                     <span class="stat-value" id="weather">--</span>
                 </div>
-                
+
                 <div class="stat-row">
                     <span class="stat-label">Total Distance:</span>
                     <span class="stat-value" id="total-distance">--</span>
                 </div>
-                
+
                 <div class="stat-row">
                     <span class="stat-label">Distance Left:</span>
                     <span class="stat-value" id="distance-left">--</span>
                 </div>
-                
+
                 <div class="stat-row">
                     <span class="stat-label">Fuel Left:</span>
                     <span class="stat-value" id="fuel-left">--</span>
                 </div>
-                
+
                 <div class="stat-row">
                     <span class="stat-label">Difficulty:</span>
                     <span class="stat-value" id="difficulty">--</span>
                 </div>
-            </div>
-            
+            </section>
+
             <div class="button-row">
                 <button id="quiz-btn">Take Quiz</button>
                 <button id="play-again-btn">Play Again</button>
@@ -67,7 +70,7 @@
             </div>
         </div>
     </main>
-    
+
     <script src="../controllers/results.js"></script>
 </body>
 </html>
