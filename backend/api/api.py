@@ -150,16 +150,16 @@ def register_routes(app):
         return {"refueled": random.choice([True, False])}
 
     @app.route("/start_game", methods=["POST"])
-    def start_game_route():
-        data = request.json or {}
-        name = data.get("name")
-
+    def start_game():
+        data = request.json
+        name = data.get("name") if data else None
         if not name:
-            return {"error": "Name required"}, 400
-
-        return {"message": f"Game started for {name}"}
-
-
+            return {"error": "Name is required"}, 400
+        try:
+            return {"message": f"Game started for {name}"}
+        except Exception as e:
+            return {"error": str(e)}, 500
+          
     @app.route("/api/players", methods=["GET"])
     def list_players():
         conn = get_connection()
@@ -202,48 +202,88 @@ def register_routes(app):
         conn.commit()
         cursor.close()
         conn.close()
-        return {"message": "Player added"}, 201
-
-
-    @app.route("/update_final_score", methods=["POST"])
-    def final_score_update():
-        body = request.json or {}
-        name = body.get("player_name")
-        diff = body.get("difficulty")
-        new_score = body.get("score", 0)
-
-        if not name:
-            return {"error": "player_name required"}, 400
-        if not diff:
-            return {"error": "difficulty required"}, 400
-
+        return {'message': 'New player added successfully'}, 201
+    @app.route('/score', methods= ["POST"])
+    def scores():
+        data = request.json
+        score = data.get("score") if data else None
+        player_name = data.get("player_name") if data else None
+        won = data.get("won", False) if data else False
+        fuel_left = data.get("fuel_left", 0) if data else 0
+        difficulty = data.get("difficulty") if data else None
+        
+        if score is None:
+            return {"error": "Score is required"}, 400
+        
+        return jsonify({
+            "success": True,
+            "score": score,
+            "player_name": player_name,
+            "won": won,
+            "fuel_left": fuel_left,
+            "difficulty": difficulty,
+            "message": "You won! Great flying!" if won else "Game over"
+        })
+      
+    @app.route('/crashed', methods= ["POST"])
+    def crashed():
+        data = request.json
+        crashed = data.get("crashed") if data else None
+        player_name = data.get("player_name") if data else None
+        fuel_left = data.get("fuel_left", 0) if data else 0
+        distance_left = data.get("distance_left", 0) if data else 0
+        difficulty = data.get("difficulty") if data else None
+        score = data.get("score", 0) if data else 0
+        if not crashed:
+            return {"error": "Crashed status is required"}, 400
+        return jsonify({
+            "success": True,
+            "crashed": crashed,
+            "player_name": player_name,
+            "fuel_left": fuel_left,
+            "distance_left": distance_left,
+            "difficulty": difficulty,
+            "score": score,
+            "message": "You crashed! Better luck next time."
+        })
+    
+    @app.route('/update_final_score', methods=["POST"])
+    def update_final_score():
+        data = request.json
+        player_name = data.get("player_name") if data else None
+        difficulty = data.get("difficulty") if data else None
+        score = data.get("score", 0) if data else 0
+        if not player_name:
+            return {"error": "player_name is required"}, 400
+        if not difficulty:
+            return {"error": "difficulty is required"}, 400
         try:
             conn = get_connection()
-            cur = conn.cursor()
-
-            col_map = {
-                "easy": "Easy_Score",
-                "medium": "Medium_Score",
-                "hard": "Hard_Score"
-            }
-
-            score_col = col_map.get(diff)
-            cur.execute(f"SELECT {score_col} FROM player WHERE Player_Name = %s", (name,))
-            row = cur.fetchone()
-
-            current = row[0] if row else 0
-            improved = new_score > current
-
-            if improved:
-                cur.execute(
-                    f"UPDATE player SET {score_col} = %s WHERE Player_Name = %s",
-                    (new_score, name)
-                )
+            cursor = conn.cursor()
+            
+            if difficulty == "easy":
+                cursor.execute('SELECT Easy_Score FROM player WHERE Player_Name = %s', (player_name,))
+            elif difficulty == "medium":
+                cursor.execute('SELECT Medium_Score FROM player WHERE Player_Name = %s', (player_name,))
+            elif difficulty == "hard":
+                cursor.execute('SELECT Hard_Score FROM player WHERE Player_Name = %s', (player_name,))
+            result = cursor.fetchone()
+            current_score = result[0] if result else 0
+            if score > current_score:
+                if difficulty == "easy":
+                    cursor.execute('UPDATE player SET Easy_Score = %s WHERE Player_Name = %s', (score, player_name))
+                elif difficulty == "medium":
+                    cursor.execute('UPDATE player SET Medium_Score = %s WHERE Player_Name = %s', (score, player_name))
+                elif difficulty == "hard":
+                    cursor.execute('UPDATE player SET Hard_Score = %s WHERE Player_Name = %s', (score, player_name))
                 conn.commit()
-
-            cur.close()
+                message = f"New high score! {score} points for {difficulty}"
+                updated = True
+            else:
+                message = f"Score {score} not higher than current best {current_score}"
+                updated = False
+            cursor.close()
             conn.close()
-
             return jsonify({
                 "success": True,
                 "player_name": name,
