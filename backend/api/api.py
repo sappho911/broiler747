@@ -8,7 +8,6 @@ from model.player import Player
 from model.airport import Airport, get_connection
 
 def register_routes(app):
-    
     @app.route("/airports", methods=["GET"])
     def get_airports():
         try:

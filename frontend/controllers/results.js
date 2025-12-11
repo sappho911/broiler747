@@ -1,13 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
-    
     const gameResultSession = JSON.parse(sessionStorage.getItem("gameResult")) || {};
     const currentGameLocal = JSON.parse(localStorage.getItem("currentGame")) || {};
     const currentGameSession = JSON.parse(sessionStorage.getItem("currentGame")) || {};
-    
     const gameResult = gameResultSession;
     const currentGame = { ...currentGameLocal, ...currentGameSession };
     const playerName = localStorage.getItem("playerName") || sessionStorage.getItem("playerName") || "Unknown";
- 
+
     console.log("gameResult:", gameResult);
     console.log("currentGame:", currentGame);
     console.log("playerName:", playerName);
@@ -23,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const difficultyEl = document.getElementById("difficulty");
     
     playerNameEl.textContent = playerName;
-    
     if (gameResult.crashed) {
         resultTitle.textContent = "CRASHED!";
         resultTitle.classList.add("crashed");
@@ -43,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
     endAirportEl.textContent = currentGame.endAirport || currentGame.end_airport || "--";
     weatherEl.textContent = currentGame.weather || gameResult.weather || "--";
     
-   
     const totalDist = currentGame.distance;
     if (totalDist) {
         totalDistanceEl.textContent = typeof totalDist === 'number' ? `${totalDist.toFixed(2)} km` : `${totalDist} km`;

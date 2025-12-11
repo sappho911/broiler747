@@ -128,7 +128,6 @@ async function sendCrashed() {
     const distanceTraveled = totalDistance - distance;
     const percentCompleted = (distanceTraveled / totalDistance) * 100;
     const partialScore = Math.round(percentCompleted / 10); // 0-10 points based on progress
-    
     try {
         const response = await fetch("http://127.0.0.1:5000/crashed", {
             method: "POST",
@@ -168,12 +167,10 @@ async function sendCrashed() {
         }));
     }
 }
-
 // Send win/score to backend
 async function sendWin() {
     const currentGame = JSON.parse(localStorage.getItem("currentGame")) || JSON.parse(sessionStorage.getItem("currentGame")) || {};
     const difficulty = currentGame.difficulty || "easy";
-    
     try {
         const response = await fetch("http://127.0.0.1:5000/score", {
             method: "POST",

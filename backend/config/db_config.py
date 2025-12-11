@@ -1,8 +1,8 @@
 DB_CONFIG = {
     "host": "127.0.0.1",
-    "port": 3306,
-    "database": "flight_game",
+    "port": 3305,
+    "database": "flight_game_new",
     "user": "root",
-    "password": "2004",
+    "password": "tishchuk6370",
     "autocommit": True
 }
