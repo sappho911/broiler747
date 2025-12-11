@@ -56,8 +56,8 @@ class Game:
                 insert_player_sql = "INSERT INTO player (Player_Name, Easy_Score, Medium_Score, Hard_Score) VALUES (%s, %s, %s, %s)"
                 cursor.execute(insert_player_sql, (self.player.player_name, 0, 0, 0))
             
-            insert_sql = "INSERT INTO game (weather, player_name, start_airport, ending_airport, distancee, difficulty) VALUES (%s, %s, %s, %s, %s, %s)"
-            cursor.execute(insert_sql, (self.weather, self.player.player_name, self.start_airport, self.ending_airport, self.distancee, self.difficulty))
+            insert_sql = "INSERT INTO game (weather, player_name, start_airport, ending_airport, distancee) VALUES (%s, %s, %s, %s, %s)"
+            cursor.execute(insert_sql, (self.weather, self.player.player_name, self.start_airport, self.ending_airport, self.distancee))
             conn.commit()
             cursor.close()
             conn.close()

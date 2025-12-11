@@ -31,6 +31,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         const listElement = document.getElementById("player_list");
         listElement.innerHTML = "<li>Could not load players. Check console.</li>";
     }
+    const chooseBtn = document.getElementById("choose_player_but");
+    const newPlayerBtn = document.getElementById("new_player_but");
+
+    // player selection button
+    chooseBtn.addEventListener("click", () => {
+        const selected = sessionStorage.getItem("selectedPlayer");
+        if (!selected) {
+            alert("Pick a player first!");
+            return;
+        }
+        window.location.href = "../views/main_menu.html";
+    });
+
+    // create a new player
+    newPlayerBtn.addEventListener("click", () => {
+        window.location.href = "../views/new_player.html";
+    });
 });
 
 

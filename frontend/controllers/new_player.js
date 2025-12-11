@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", () => {
     const createBtn = document.getElementById("create_player_btn");
     const nameInput = document.getElementById("player_name_input");
@@ -22,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 statusMessage.textContent = "Player created!";
                 setTimeout(() => {
                     window.location.href = "choose_player.html";
-                }, 800);
+                }, 1000);
             } else {
                 statusMessage.textContent = result.error || "Error creating player.";
             }
