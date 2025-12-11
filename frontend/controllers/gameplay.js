@@ -1,21 +1,24 @@
-// main references used:
-// https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript
-// https://chriscourses.com/blog/coding-collision-detection-in-javascript
-// const images before canvas is created
+// basic image setup (just loading everything here)
 const planeImg = new Image();
 planeImg.src = "../public/img/gameplay_airplane.png";
+
 const cloudImg = new Image();
 cloudImg.src = "../public/img/cloud.png";
+
 const birdImg = new Image();
 birdImg.src = "../public/img/bird.png";
+
 const fuelImg = new Image();
 fuelImg.src = "../public/img/fuel.png";
-// didn't end up using coin image, but keeping it for later
-const coinImg = new Image();
+
+const coinImg = new Image(); // might use later
 coinImg.src = "../public/img/coin.png";
-// canvas, player, obstacles setup
+
+// canvas stuff
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+
+// very basic player object
 const player = {
     x: 100,
     y: 200,
@@ -23,194 +26,174 @@ const player = {
     height: 40,
     speed: 4
 };
+
 let obstacles = [];
 let lastSpawn = 0;
-const spawnInterval = 900; // ms
-// Game state (distance from back, 
-// after route is selected from choose airports window)
-let fuel = 100;
-let distance = sessionStorage.getItem("currentGame") ?
-    JSON.parse(sessionStorage.getItem("currentGame")).distance : 100; 
-let running = true;
-// Game running state
-// Weather (up to update, need weather from previous window - airport selection)
-const weatherTypes = ["Sunny", "Cloudy", "Rainy"];
-const weather = sessionStorage.getItem("currentGame") ?
-    JSON.parse(sessionStorage.getItem("currentGame")).weather : "Sunny";
-document.getElementById("weather").textContent = weather;
-// Input keys
-let keys = {};
-document.addEventListener("keydown", (e) => keys[e.key] = true);
-document.addEventListener("keyup", (e) => keys[e.key] = false);
+const spawnInterval = 900; // ms between obstacles
 
+// game state (taken from previous page)
+const savedGame = sessionStorage.getItem("currentGame")
+    ? JSON.parse(sessionStorage.getItem("currentGame"))
+    : {};
+
+let fuel = 100;
+let distance = savedGame.distance || 100;
+let running = true;
+// weather coming from previous window
+let weather = savedGame.weather || "Sunny";
+document.getElementById("weather").textContent = weather;
+// key inputs
+let keys = {};
+document.addEventListener("keydown", e => keys[e.key] = true);
+document.addEventListener("keyup", e => keys[e.key] = false);
+
+// random obstacle
 function spawnObstacle() {
-    const types = ["cloud", "bird", "fuel"];
-    const type = types[Math.floor(Math.random() * types.length)];
+    const choice = ["cloud", "bird", "fuel"];
+    const type = choice[Math.floor(Math.random() * choice.length)];
     let img;
-    if (type === "cloud") img = cloudImg;
-    if (type === "bird") img = birdImg;
-    if (type === "fuel") img = fuelImg;
+    let size = { w: 50, h: 50 };
+    let speed = 3;
+    if (type === "cloud") {
+        img = cloudImg;
+        size = { w: 100, h: 50 };
+        speed = 2;
+    } else if (type === "bird") {
+        img = birdImg;
+        size = { w: 20, h: 20 };
+        speed = 5;
+    } else {
+        img = fuelImg;
+    }
     obstacles.push({
         type,
         img,
         x: canvas.width,
-        y: Math.random() * (canvas.height - 50),
-        width: type === "bird" ? 20 : type === "cloud" ? 100 : type === "fuel" ? 50 : 50,
-        height: type === "bird" ? 20 : type === "cloud" ? 50 : type === "fuel" ? 50 : 50,
-        speed: type === "bird" ? 5 : type === "cloud" ? 2 :  type === "fuel" ? 3 : 0
+        y: Math.random() * (canvas.height - size.h),
+        width: size.w,
+        height: size.h,
+        speed
     });
 }
-// Collision detection - only one hit
-// ref - https://chriscourses.com/blog/coding-collision-detection-in-javascript
-// ref - https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript/Collision_detection
-// comparing object's positions and their width and height
+// dumb but reliable collision detection
 function rectCollision(a, b) {
     return (
-        a.x < b.x + b.width && a.x + a.width > b.x &&
-        a.y < b.y + b.height && a.y + a.height > b.y
+        a.x < b.x + b.width &&
+        a.x + a.width > b.x &&
+        a.y < b.y + b.height &&
+        a.y + a.height > b.y
     );
 }
-// Main Game loop
+// core loop
 let lastTime = 0;
-function gameLoop(timestamp) {
+function gameLoop(ts) {
     if (!running) return;
-    const delta = timestamp - lastTime;
-    lastTime = timestamp;
-    // Clear screen
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // Background (different gifs are uploaded here, for now colors)
-    if (weather === "Cloudy") {
-        ctx.fillStyle = "#cce";
-    } else if (weather === "Rainy") {
-        ctx.fillStyle = "#99a";
-    } else {
-        ctx.fillStyle = "#aee";
-    }
+    const dt = ts - lastTime;
+    lastTime = ts;
+    // background depending on weather, temporary colors
+    if (weather === "Cloudy") ctx.fillStyle = "#cce";
+    else if (weather === "Rainy") ctx.fillStyle = "#99a";
+    else ctx.fillStyle = "#aee";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // Player movement
+    // player movement
     if (keys["ArrowUp"] && player.y > 0) player.y -= player.speed;
     if (keys["ArrowDown"] && player.y < canvas.height - player.height) player.y += player.speed;
-    // Draw player (image is scuffed, but fine)
+    // draw airplane
     ctx.drawImage(planeImg, player.x, player.y, player.width, player.height);
-    if (timestamp - lastSpawn > spawnInterval) {
+    // spawn new obstacles occasionally
+    if (ts - lastSpawn > spawnInterval) {
         spawnObstacle();
-        lastSpawn = timestamp;
+        lastSpawn = ts;
     }
-    // Update obstacles (change to certain images - clouds, birds, etc)
-    obstacles.forEach((obstacle) => {
-        // obstacle movement to the left
-        obstacle.x -= obstacle.speed;
-        ctx.drawImage(obstacle.img, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-        if (rectCollision(player, obstacle)) {
+
+    // update all obstacles
+    obstacles.forEach(o => {
+        o.x -= o.speed;
+        ctx.drawImage(o.img, o.x, o.y, o.width, o.height);
+        // if we hit something -> game ends
+        if (rectCollision(player, o)) {
             endGame();
         }
     });
-    // Remove off-screen obstacles
-    obstacles = obstacles.filter(obst => obst.x + obst.width > 0);
-    // Fuel + distance - up to debate what are values here 
-    // + consider fuel barrels taken upon collision
+
+    // remove those that moved left off screen
+    obstacles = obstacles.filter(o => o.x + o.width > 0);
+    // fuel + distance decrease
     fuel -= 0.01;
     distance -= 0.05;
+
     document.getElementById("fuel").textContent = fuel.toFixed(1);
     document.getElementById("distance").textContent = distance.toFixed(1);
+
     if (fuel <= 0) endGame();
     if (distance <= 0) winGame();
-    // requestAnimationFrame to create an animation loop
+
     requestAnimationFrame(gameLoop);
 }
+
 requestAnimationFrame(gameLoop);
 
-// Send crashed status to backend
+// crash event
 async function sendCrashed() {
-    const currentGame = JSON.parse(localStorage.getItem("currentGame")) || JSON.parse(sessionStorage.getItem("currentGame")) || {};
-    const difficulty = currentGame.difficulty || "easy";
-    const totalDistance = currentGame.distance || 100;
-    const distanceTraveled = totalDistance - distance;
-    const percentCompleted = (distanceTraveled / totalDistance) * 100;
-    const partialScore = Math.round(percentCompleted / 10); // 0-10 points based on progress
+    const name = localStorage.getItem("playerName");
+    const total = savedGame.distance || 100;
+
+    const traveled = total - distance;
+    const part = Math.round((traveled / total) * 10);
+
     try {
-        const response = await fetch("http://127.0.0.1:5000/crashed", {
+        await fetch("http://127.0.0.1:5000/crashed", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 crashed: true,
-                player_name: localStorage.getItem("playerName"),
+                player_name: name,
                 fuel_left: fuel.toFixed(1),
                 distance_left: distance.toFixed(1),
-                difficulty: difficulty,
-                score: partialScore
+                difficulty: savedGame.difficulty || "easy",
+                score: part
             })
         });
-        const data = await response.json();
-        console.log("Crashed status sent:", data);
-        
-        // Store result in sessionStorage for Results page
-        sessionStorage.setItem("gameResult", JSON.stringify({
-            crashed: true,
-            won: false,
-            fuel_left: fuel.toFixed(1),
-            distance_left: distance.toFixed(1),
-            weather: weather
-        }));
-        
-    } catch (err) {
-        console.error("Error sending crashed status:", err);
-        // Still store locally even if backend fails
-        sessionStorage.setItem("gameResult", JSON.stringify({
-            crashed: true,
-            won: false,
-            fuel_left: fuel.toFixed(1),
-            distance_left: distance.toFixed(1),
-            weather: weather
-        }));
+    } catch (e) {
+        console.log("Couldn't send crash info:", e);
     }
+    // still store result locally
+    sessionStorage.setItem("gameResult", JSON.stringify({
+        crashed: true,
+        won: false,
+        fuel_left: fuel.toFixed(1),
+        distance_left: distance.toFixed(1),
+        weather
+    }));
 }
-// Send win/score to backend
+// win event
 async function sendWin() {
-    const currentGame = JSON.parse(localStorage.getItem("currentGame")) || JSON.parse(sessionStorage.getItem("currentGame")) || {};
-    const difficulty = currentGame.difficulty || "easy";
+    const name = localStorage.getItem("playerName");
     try {
-        const response = await fetch("http://127.0.0.1:5000/score", {
+        await fetch("http://127.0.0.1:5000/score", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                score: Math.round(fuel), 
-                player_name: localStorage.getItem("playerName"),
+                score: Math.round(fuel),
+                player_name: name,
                 won: true,
                 fuel_left: fuel.toFixed(1),
-                difficulty: difficulty
+                difficulty: savedGame.difficulty || "easy"
             })
         });
-        const data = await response.json();
-        console.log("Win score sent:", data);
-        
-        // Store result in sessionStorage for Results page
-        sessionStorage.setItem("gameResult", JSON.stringify({
-            crashed: false,
-            won: true,
-            fuel_left: fuel.toFixed(1),
-            distance_left: "0",
-            weather: weather
-        }));
-        
-    } catch (err) {
-        console.error("Error sending win score:", err);
-        // Still store locally even if backend fails
-        sessionStorage.setItem("gameResult", JSON.stringify({
-            crashed: false,
-            won: true,
-            fuel_left: fuel.toFixed(1),
-            distance_left: "0",
-            weather: weather
-        }));
+    } catch (e) {
+        console.log("Couldn't send win info:", e);
     }
-}
 
-// Game end conditions - redirect to Results page
+    sessionStorage.setItem("gameResult", JSON.stringify({
+        crashed: false,
+        won: true,
+        fuel_left: fuel.toFixed(1),
+        distance_left: "0",
+        weather
+    }));
+}
+// redirecting
 async function endGame() {
     running = false;
     await sendCrashed();
@@ -221,7 +204,7 @@ async function winGame() {
     await sendWin();
     window.location.href = "Results.html";
 }
-// Pause button
+// pause
 document.getElementById("pauseButton").addEventListener("click", () => {
     running = !running;
     if (running) requestAnimationFrame(gameLoop);

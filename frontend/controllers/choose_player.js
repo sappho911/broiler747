@@ -1,45 +1,54 @@
 import { getPlayers } from "../model/players.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
+    // try to load players from backend
+    let players = [];
     try {
-        const players = await getPlayers();
-        makePlayerList(players);
-        const chooseBtn = document.getElementById("choose_player_but");
-        const newPlayerBtn = document.getElementById("new_player_but");
-        chooseBtn.addEventListener("click", () => {
-            const selectedPlayer = sessionStorage.getItem("selectedPlayer");
-            if (selectedPlayer) {
-                window.location.href = "../views/main_menu.html";
-            } else {
-                alert("Please select a player first!");
-            }
-        });
-        newPlayerBtn.addEventListener("click", () => {
-            window.location.href = "../views/new_player.html";
-        });
-
-    } catch (error) {
-        console.error("Failed to load players:", error);
-        const playerList = document.getElementById("player_list");
-        playerList.innerHTML = "<li>Failed to load players. Check console.</li>";
+        players = await getPlayers();
+        renderPlayerList(players);
+    } catch (err) {
+        console.error("Error loading players:", err);
+        const list = document.getElementById("player_list");
+        list.innerHTML = "<li>Could not load players</li>";
+        return;
     }
+    const chooseBtn = document.getElementById("choose_player_but");
+    const newPlayerBtn = document.getElementById("new_player_but");
+
+    // player selection button
+    chooseBtn.addEventListener("click", () => {
+        const selected = sessionStorage.getItem("selectedPlayer");
+        if (!selected) {
+            alert("Pick a player first!");
+            return;
+        }
+        window.location.href = "../views/main_menu.html";
+    });
+
+    // create a new player
+    newPlayerBtn.addEventListener("click", () => {
+        window.location.href = "../views/new_player.html";
+    });
 });
 
-function makePlayerList(players) {
-    const playerList = document.getElementById("player_list");
-    playerList.innerHTML = "";
-    players.forEach(player => {
-        const li = document.createElement("li");
-        li.textContent = player.name;
-        li.addEventListener("click", () => {
-            // Deselect all
-            document.querySelectorAll("#player_list li").forEach(item => {
-                item.classList.remove("selected");
-            });
-            li.classList.add("selected");
-            sessionStorage.setItem("selectedPlayer", player.name);
-            document.getElementById("choose_player_but").disabled = false;
+
+function renderPlayerList(players) {
+    const list = document.getElementById("player_list");
+    list.innerHTML = "";
+    players.forEach(p => {
+        const row = document.createElement("li");
+        row.textContent = p.name;
+        row.addEventListener("click", () => {
+            // clear previous highlight
+            list.querySelectorAll("li").forEach(li => li.classList.remove("selected"));
+
+            row.classList.add("selected");
+            sessionStorage.setItem("selectedPlayer", p.name);
+
+            const chooseBtn = document.getElementById("choose_player_but");
+            chooseBtn.disabled = false;
         });
-        playerList.appendChild(li);
+
+        list.appendChild(row);
     });
 }
