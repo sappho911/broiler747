@@ -11,6 +11,10 @@ For this project to function properly, use modified_db.sql . It contains modifie
 ## Controls
 Controls are made by using arrows keys: Up and Down
 
+## Booting process:
+*  Run the server: app.py
+*  Entry point: main_menu.html
+
 **Project Overview**
 --------------------
 
